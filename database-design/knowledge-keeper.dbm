@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+CAUTION: Do not modify this file unless you know what you are doing.
+         Unexpected results may occur if the code is changed deliberately.
+-->
+<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="0,0" last-zoom="1"
+	 default-schema="public">
+<database name="knowledge-keepers" is-template="false" allow-conns="true">
+</database>
+
+<schema name="public" fill-color="#e1e1e1" sql-disabled="true">
+</schema>
+
+<table name="categories">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="493" y="265"/>
+	<column name="category_id" not-null="true">
+		<type name="bigserial" length="0"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="varchar" length="50"/>
+	</column>
+	<column name="description">
+		<type name="varchar" length="500"/>
+	</column>
+	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP()">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="date_updated">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="created_by" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="updated_by">
+		<type name="bigint" length="0"/>
+	</column>
+	<constraint name="categories_pk" type="pk-constr" table="public.categories">
+		<columns names="category_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="users">
+	<schema name="public"/>
+	<position x="501" y="24"/>
+	<column name="user_id" not-null="true">
+		<type name="bigserial" length="0"/>
+	</column>
+	<column name="email" not-null="true">
+		<type name="varchar" length="255"/>
+	</column>
+	<column name="first_name">
+		<type name="varchar" length="50"/>
+	</column>
+	<column name="last_name">
+		<type name="varchar" length="50"/>
+	</column>
+	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP()">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="date_updated">
+		<type name="timestamp" length="0"/>
+	</column>
+	<constraint name="users_pk" type="pk-constr" table="public.users">
+		<columns names="user_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="users_email_unique_idx" table="public.users"
+	 concurrent="false" unique="true" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<expression><![CDATA[LOWER(email)]]></expression>
+		</idxelement>
+</index>
+
+<table name="topics">
+	<schema name="public"/>
+	<position x="129" y="280"/>
+	<column name="topic_id" not-null="true">
+		<type name="bigserial" length="0"/>
+	</column>
+	<column name="category_id" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="title" not-null="true">
+		<type name="varchar" length="50"/>
+	</column>
+	<column name="description">
+		<type name="varchar" length="1000"/>
+	</column>
+	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP()">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="date_updated">
+		<type name="timestamp" length="0"/>
+	</column>
+	<constraint name="topics_pk" type="pk-constr" table="public.topics">
+		<columns names="topic_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<constraint name="categories_created_by_fk" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.users" table="public.categories">
+	<columns names="created_by" ref-type="src-columns"/>
+	<columns names="user_id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="categories_updated_by_fk" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.users" table="public.categories">
+	<columns names="updated_by" ref-type="src-columns"/>
+	<columns names="user_id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="topics_category_fk" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.categories" table="public.topics">
+	<columns names="topic_id" ref-type="src-columns"/>
+	<columns names="category_id" ref-type="dst-columns"/>
+</constraint>
+
+<relationship name="categories_created_by" type="relfk"
+	 src-table="public.categories"
+	 dst-table="public.users" reference-fk="categories_created_by_fk"
+	 src-required="false" dst-required="false">
+	<label ref-type="name-label">
+		<position x="77.4819" y="-14.5266"/>
+	</label>
+</relationship>
+
+<relationship name="categories_updated_by" type="relfk"
+	 src-table="public.categories"
+	 dst-table="public.users" reference-fk="categories_updated_by_fk"
+	 src-required="false" dst-required="false">
+	<label ref-type="name-label">
+		<position x="-77.5597" y="-14.5266"/>
+	</label>
+</relationship>
+
+<relationship name="category_topics" type="relfk"
+	 src-table="public.topics"
+	 dst-table="public.categories" reference-fk="topics_category_fk"
+	 src-required="false" dst-required="false">
+	<label ref-type="name-label">
+		<position x="0" y="0"/>
+	</label>
+</relationship>
+
+</dbmodel>
