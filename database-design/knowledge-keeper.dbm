@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="0,0" last-zoom="1"
+<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="0,372" last-zoom="1"
 	 default-schema="public">
 <database name="knowledge-keepers" is-template="false" allow-conns="true">
 </database>
@@ -13,8 +13,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 
 <table name="categories">
 	<schema name="public"/>
-	<role name="postgres"/>
-	<position x="493" y="265"/>
+	<position x="520" y="15"/>
 	<column name="category_id" not-null="true">
 		<type name="bigserial" length="0"/>
 	</column>
@@ -24,17 +23,17 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<column name="description">
 		<type name="varchar" length="500"/>
 	</column>
-	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP()">
-		<type name="timestamp" length="0"/>
-	</column>
-	<column name="date_updated">
-		<type name="timestamp" length="0"/>
-	</column>
 	<column name="created_by" not-null="true">
 		<type name="bigint" length="0"/>
 	</column>
 	<column name="updated_by">
 		<type name="bigint" length="0"/>
+	</column>
+	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP()">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="date_updated">
+		<type name="timestamp" length="0"/>
 	</column>
 	<constraint name="categories_pk" type="pk-constr" table="public.categories">
 		<columns names="category_id" ref-type="src-columns"/>
@@ -43,7 +42,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 
 <table name="users">
 	<schema name="public"/>
-	<position x="501" y="24"/>
+	<position x="17" y="23"/>
 	<column name="user_id" not-null="true">
 		<type name="bigserial" length="0"/>
 	</column>
@@ -77,7 +76,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 
 <table name="topics">
 	<schema name="public"/>
-	<position x="129" y="280"/>
+	<position x="533" y="280"/>
 	<column name="topic_id" not-null="true">
 		<type name="bigserial" length="0"/>
 	</column>
@@ -90,6 +89,12 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<column name="description">
 		<type name="varchar" length="1000"/>
 	</column>
+	<column name="created_by" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="updated_by">
+		<type name="bigint" length="0"/>
+	</column>
 	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP()">
 		<type name="timestamp" length="0"/>
 	</column>
@@ -100,6 +105,212 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		<columns names="topic_id" ref-type="src-columns"/>
 	</constraint>
 </table>
+
+<table name="tags">
+	<schema name="public"/>
+	<position x="154" y="825"/>
+	<column name="name" not-null="true">
+		<type name="varchar" length="50"/>
+	</column>
+	<column name="tag_id" not-null="true">
+		<type name="bigserial" length="0"/>
+	</column>
+	<column name="created_by" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="updated_by">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP()">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="date_updated">
+		<type name="timestamp" length="0"/>
+	</column>
+	<constraint name="tags_pk" type="pk-constr" table="public.tags">
+		<columns names="tag_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="topics_tags">
+	<schema name="public"/>
+	<position x="166.5" y="619.5"/>
+
+	<customidxs object-type="column">
+		<object name="tag_id_tags" index="1"/>
+		<object name="topic_id_topics" index="0"/>
+	</customidxs>
+
+	<customidxs object-type="constraint">
+		<object name="tags_fk" index="2"/>
+		<object name="topics_fk" index="1"/>
+		<object name="topics_tags_pk" index="0"/>
+	</customidxs>
+</table>
+
+<relationship name="topic_tags" type="rel1n"
+	 src-col-pattern="{sc}_{st}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 src-table="public.topics"
+	 dst-table="public.topics_tags"
+	 src-required="true" dst-required="false"
+	 identifier="true"
+
+	upd-action="CASCADE"
+	del-action="CASCADE">
+	<line>
+		<position x="285" y="382"/>
+	</line>
+	<label ref-type="name-label">
+		<position x="-100.526" y="5.82669"/>
+	</label>
+</relationship>
+
+<relationship name="tag_topics" type="rel1n"
+	 src-col-pattern="{sc}_{st}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 src-table="public.tags"
+	 dst-table="public.topics_tags"
+	 src-required="true" dst-required="false"
+	 identifier="true"
+
+	upd-action="CASCADE"
+	del-action="CASCADE">
+	<label ref-type="name-label">
+		<position x="-0.336676" y="-21.7766"/>
+	</label>
+</relationship>
+
+<usertype name="media_type" configuration="enumeration">
+	<schema name="public"/>
+	<enumeration values="link,image,video"/>
+</usertype>
+
+<table name="media">
+	<schema name="public"/>
+	<position x="531" y="608"/>
+	<column name="media_id" not-null="true">
+		<type name="bigserial" length="0"/>
+	</column>
+	<column name="type" not-null="true">
+		<type name="public.media_type" length="25"/>
+	</column>
+	<column name="title" not-null="true">
+		<type name="varchar" length="50"/>
+	</column>
+	<column name="description">
+		<type name="varchar" length="500"/>
+	</column>
+	<column name="url" not-null="true">
+		<type name="varchar" length="255"/>
+	</column>
+	<column name="created_by" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="updated_by">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP()">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="date_updated">
+		<type name="timestamp" length="0"/>
+	</column>
+	<constraint name="media_pk" type="pk-constr" table="public.media">
+		<columns names="media_id" ref-type="src-columns"/>
+	</constraint>
+
+	<customidxs object-type="column">
+		<object name="topic_id" index="9"/>
+	</customidxs>
+
+	<customidxs object-type="constraint">
+		<object name="topics_media_fk" index="1"/>
+	</customidxs>
+</table>
+
+<table name="notes">
+	<schema name="public"/>
+	<position x="883" y="633"/>
+	<column name="note_id" not-null="true">
+		<type name="bigserial" length="0"/>
+	</column>
+	<column name="title" not-null="true">
+		<type name="varchar" length="50"/>
+	</column>
+	<column name="description">
+		<type name="varchar" length="500"/>
+	</column>
+	<column name="url" not-null="true">
+		<type name="varchar" length="255"/>
+	</column>
+	<column name="created_by" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="updated_by">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP()">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="date_updated">
+		<type name="timestamp" length="0"/>
+	</column>
+	<constraint name="notes_pk" type="pk-constr" table="public.notes">
+		<columns names="note_id" ref-type="src-columns"/>
+	</constraint>
+
+	<customidxs object-type="column">
+		<object name="topic_id" index="8"/>
+	</customidxs>
+
+	<customidxs object-type="constraint">
+		<object name="topics_notes_fk" index="1"/>
+	</customidxs>
+</table>
+
+<index name="media_type_idx" table="public.media"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="type"/>
+		</idxelement>
+</index>
+
+<relationship name="topic_notes" type="rel1n"
+	 src-col-pattern="{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_{dt}_fk"
+	 custom-color="#83af1f"
+	 src-table="public.topics"
+	 dst-table="public.notes"
+	 src-required="false" dst-required="false"
+	upd-action="CASCADE"
+	del-action="CASCADE">
+	<line>
+		<position x="1008" y="379"/>
+	</line>
+	<label ref-type="name-label">
+		<position x="3.12828" y="-108.061"/>
+	</label>
+</relationship>
+
+<relationship name="topic_media" type="rel1n"
+	 src-col-pattern="{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_{dt}_fk"
+	 custom-color="#83af1f"
+	 src-table="public.topics"
+	 dst-table="public.media"
+	 src-required="false" dst-required="false"
+	upd-action="CASCADE"
+	del-action="CASCADE">
+	<label ref-type="name-label">
+		<position x="22.9023" y="-17.6857"/>
+	</label>
+</relationship>
 
 <constraint name="categories_created_by_fk" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.users" table="public.categories">
@@ -119,12 +330,60 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<columns names="category_id" ref-type="dst-columns"/>
 </constraint>
 
+<constraint name="topics_created_by_fk" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.users" table="public.topics">
+	<columns names="created_by" ref-type="src-columns"/>
+	<columns names="user_id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="topics_updated_by_fk" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.users" table="public.topics">
+	<columns names="updated_by" ref-type="src-columns"/>
+	<columns names="user_id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="tags_created_by_fk" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.users" table="public.tags">
+	<columns names="created_by" ref-type="src-columns"/>
+	<columns names="user_id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="tags_updated_by_fk" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.users" table="public.tags">
+	<columns names="updated_by" ref-type="src-columns"/>
+	<columns names="user_id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="media_created_by_fk" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.users" table="public.media">
+	<columns names="created_by" ref-type="src-columns"/>
+	<columns names="user_id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="media_updated_by_fk" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.users" table="public.media">
+	<columns names="updated_by" ref-type="src-columns"/>
+	<columns names="user_id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="notes_created_by_fk" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.users" table="public.notes">
+	<columns names="created_by" ref-type="src-columns"/>
+	<columns names="user_id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="notes_updated_by_fk" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.users" table="public.notes">
+	<columns names="updated_by" ref-type="src-columns"/>
+	<columns names="user_id" ref-type="dst-columns"/>
+</constraint>
+
 <relationship name="categories_created_by" type="relfk"
 	 src-table="public.categories"
 	 dst-table="public.users" reference-fk="categories_created_by_fk"
 	 src-required="false" dst-required="false">
 	<label ref-type="name-label">
-		<position x="77.4819" y="-14.5266"/>
+		<position x="-1.89075" y="-23.3359"/>
 	</label>
 </relationship>
 
@@ -133,7 +392,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	 dst-table="public.users" reference-fk="categories_updated_by_fk"
 	 src-required="false" dst-required="false">
 	<label ref-type="name-label">
-		<position x="-77.5597" y="-14.5266"/>
+		<position x="-1.39075" y="-20.7943"/>
 	</label>
 </relationship>
 
@@ -143,6 +402,100 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	 src-required="false" dst-required="false">
 	<label ref-type="name-label">
 		<position x="0" y="0"/>
+	</label>
+</relationship>
+
+<relationship name="topics_created_by" type="relfk"
+	 src-table="public.topics"
+	 dst-table="public.users" reference-fk="topics_created_by_fk"
+	 src-required="false" dst-required="false">
+	<label ref-type="name-label">
+		<position x="55.2715" y="-15.4"/>
+	</label>
+</relationship>
+
+<relationship name="topics_updated_by" type="relfk"
+	 src-table="public.topics"
+	 dst-table="public.users" reference-fk="topics_updated_by_fk"
+	 src-required="false" dst-required="false">
+	<label ref-type="name-label">
+		<position x="70.0785" y="-5.42292"/>
+	</label>
+</relationship>
+
+<relationship name="tags_created_by" type="relfk"
+	 src-table="public.tags"
+	 dst-table="public.users" reference-fk="tags_created_by_fk"
+	 src-required="false" dst-required="false">
+	<line>
+		<position x="76" y="930"/>
+	</line>
+	<label ref-type="name-label">
+		<position x="31.6141" y="59.9734"/>
+	</label>
+</relationship>
+
+<relationship name="tags_updated_by" type="relfk"
+	 src-table="public.tags"
+	 dst-table="public.users" reference-fk="tags_updated_by_fk"
+	 src-required="false" dst-required="false">
+	<line>
+		<position x="52" y="973"/>
+	</line>
+	<label ref-type="name-label">
+		<position x="18.3159" y="6.47344"/>
+	</label>
+</relationship>
+
+<relationship name="media_created_by" type="relfk"
+	 src-table="public.media"
+	 dst-table="public.users" reference-fk="media_created_by_fk"
+	 src-required="false" dst-required="false">
+	<line>
+		<position x="648" y="549"/>
+	<position x="25" y="550"/>
+	</line>
+	<label ref-type="name-label">
+		<position x="242.701" y="111.973"/>
+	</label>
+</relationship>
+
+<relationship name="media_updated_by" type="relfk"
+	 src-table="public.media"
+	 dst-table="public.users" reference-fk="media_updated_by_fk"
+	 src-required="false" dst-required="false">
+	<line>
+		<position x="523" y="565"/>
+	<position x="24" y="567"/>
+	</line>
+	<label ref-type="name-label">
+		<position x="188.474" y="-23.4016"/>
+	</label>
+</relationship>
+
+<relationship name="notes_created_by" type="relfk"
+	 src-table="public.notes"
+	 dst-table="public.users" reference-fk="notes_created_by_fk"
+	 src-required="false" dst-required="false">
+	<line>
+		<position x="876" y="536"/>
+	<position x="26" y="533"/>
+	</line>
+	<label ref-type="name-label">
+		<position x="424.974" y="6.59844"/>
+	</label>
+</relationship>
+
+<relationship name="notes_updated_by" type="relfk"
+	 src-table="public.notes"
+	 dst-table="public.users" reference-fk="notes_updated_by_fk"
+	 src-required="false" dst-required="false">
+	<line>
+		<position x="953" y="519"/>
+	<position x="23" y="518"/>
+	</line>
+	<label ref-type="name-label">
+		<position x="383.474" y="-25.4016"/>
 	</label>
 </relationship>
 
