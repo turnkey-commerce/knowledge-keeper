@@ -1,6 +1,6 @@
 -- Database generated with pgModeler (PostgreSQL Database Modeler).
 -- pgModeler  version: 0.9.1
--- PostgreSQL version: 10.0
+-- PostgreSQL version: 9.6
 -- Project Site: pgmodeler.io
 -- Model Author: James Culbertson
 
@@ -21,7 +21,7 @@ CREATE TABLE public.categories(
 	description varchar(500),
 	created_by bigint NOT NULL,
 	updated_by bigint,
-	date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+	date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	date_updated timestamp,
 	CONSTRAINT categories_pk PRIMARY KEY (category_id)
 
@@ -35,7 +35,7 @@ CREATE TABLE public.users(
 	email varchar(255) NOT NULL,
 	first_name varchar(50),
 	last_name varchar(50),
-	date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+	date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	date_updated timestamp,
 	CONSTRAINT users_pk PRIMARY KEY (user_id)
 
@@ -60,7 +60,7 @@ CREATE TABLE public.topics(
 	description varchar(1000),
 	created_by bigint NOT NULL,
 	updated_by bigint,
-	date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+	date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	date_updated timestamp,
 	CONSTRAINT topics_pk PRIMARY KEY (topic_id)
 
@@ -74,7 +74,7 @@ CREATE TABLE public.tags(
 	tag_id bigserial NOT NULL,
 	created_by bigint NOT NULL,
 	updated_by bigint,
-	date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+	date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	date_updated timestamp,
 	CONSTRAINT tags_pk PRIMARY KEY (tag_id)
 
@@ -121,7 +121,7 @@ CREATE TABLE public.media(
 	url varchar(255) NOT NULL,
 	created_by bigint NOT NULL,
 	updated_by bigint,
-	date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+	date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	date_updated timestamp,
 	topic_id bigint,
 	CONSTRAINT media_pk PRIMARY KEY (media_id)
@@ -135,10 +135,9 @@ CREATE TABLE public.notes(
 	note_id bigserial NOT NULL,
 	title varchar(50) NOT NULL,
 	description varchar(500),
-	url varchar(255) NOT NULL,
 	created_by bigint NOT NULL,
 	updated_by bigint,
-	date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+	date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	date_updated timestamp,
 	topic_id bigint,
 	CONSTRAINT notes_pk PRIMARY KEY (note_id)

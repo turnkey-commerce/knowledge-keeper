@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="0,372" last-zoom="1"
+<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="0,539" last-zoom="1"
 	 default-schema="public">
 <database name="knowledge-keepers" is-template="false" allow-conns="true">
 </database>
@@ -29,7 +29,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<column name="updated_by">
 		<type name="bigint" length="0"/>
 	</column>
-	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP()">
+	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP">
 		<type name="timestamp" length="0"/>
 	</column>
 	<column name="date_updated">
@@ -55,7 +55,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<column name="last_name">
 		<type name="varchar" length="50"/>
 	</column>
-	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP()">
+	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP">
 		<type name="timestamp" length="0"/>
 	</column>
 	<column name="date_updated">
@@ -95,7 +95,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<column name="updated_by">
 		<type name="bigint" length="0"/>
 	</column>
-	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP()">
+	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP">
 		<type name="timestamp" length="0"/>
 	</column>
 	<column name="date_updated">
@@ -121,7 +121,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<column name="updated_by">
 		<type name="bigint" length="0"/>
 	</column>
-	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP()">
+	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP">
 		<type name="timestamp" length="0"/>
 	</column>
 	<column name="date_updated">
@@ -212,7 +212,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<column name="updated_by">
 		<type name="bigint" length="0"/>
 	</column>
-	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP()">
+	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP">
 		<type name="timestamp" length="0"/>
 	</column>
 	<column name="date_updated">
@@ -243,16 +243,13 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<column name="description">
 		<type name="varchar" length="500"/>
 	</column>
-	<column name="url" not-null="true">
-		<type name="varchar" length="255"/>
-	</column>
 	<column name="created_by" not-null="true">
 		<type name="bigint" length="0"/>
 	</column>
 	<column name="updated_by">
 		<type name="bigint" length="0"/>
 	</column>
-	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP()">
+	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP">
 		<type name="timestamp" length="0"/>
 	</column>
 	<column name="date_updated">
@@ -263,7 +260,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	</constraint>
 
 	<customidxs object-type="column">
-		<object name="topic_id" index="8"/>
+		<object name="topic_id" index="7"/>
 	</customidxs>
 
 	<customidxs object-type="constraint">
