@@ -1,0 +1,4 @@
+github.com/lib/pq v1.8.0 h1:9xohqzkUwzR4Ga4ivdTcawVS89YSDVxXMa3xJX3cGzg=
+github.com/lib/pq v1.8.0/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
+github.com/xo/dburl v0.0.0-20200910011426-652e0d5720a3 h1:WchQs0yWhP3iA3CFE57fmCltE5dx5FkbUZOJZBjEtJ8=
+github.com/xo/dburl v0.0.0-20200910011426-652e0d5720a3/go.mod h1:TM8VMBT+LWqC3MBOulZjb8FAthcvZq0t/qvDLwS6skU=
