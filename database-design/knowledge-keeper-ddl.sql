@@ -238,7 +238,7 @@ ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- object: topics_category_fk | type: CONSTRAINT --
 -- ALTER TABLE public.topics DROP CONSTRAINT IF EXISTS topics_category_fk CASCADE;
-ALTER TABLE public.topics ADD CONSTRAINT topics_category_fk FOREIGN KEY (topic_id)
+ALTER TABLE public.topics ADD CONSTRAINT topics_category_fk FOREIGN KEY (category_id)
 REFERENCES public.categories (category_id) MATCH FULL
 ON DELETE NO ACTION ON UPDATE NO ACTION;
 -- ddl-end --

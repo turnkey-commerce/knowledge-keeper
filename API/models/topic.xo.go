@@ -166,11 +166,11 @@ func (t *Topic) Delete(db XODB) error {
 	return nil
 }
 
-// Category returns the Category associated with the Topic's TopicID (topic_id).
+// Category returns the Category associated with the Topic's CategoryID (category_id).
 //
 // Generated from foreign key 'topics_category_fk'.
 func (t *Topic) Category(db XODB) (*Category, error) {
-	return CategoryByCategoryID(db, t.TopicID)
+	return CategoryByCategoryID(db, t.CategoryID)
 }
 
 // UserByCreatedBy returns the User associated with the Topic's CreatedBy (created_by).
