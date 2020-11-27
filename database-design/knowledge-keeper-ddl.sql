@@ -7,9 +7,9 @@
 
 -- Database creation must be done outside a multicommand file.
 -- These commands were put in this file only as a convenience.
--- -- object: "knowledge-keepers" | type: DATABASE --
--- -- DROP DATABASE IF EXISTS "knowledge-keepers";
--- CREATE DATABASE "knowledge-keepers";
+-- -- object: "knowledge-keeper" | type: DATABASE --
+-- -- DROP DATABASE IF EXISTS "knowledge-keeper";
+-- CREATE DATABASE "knowledge-keeper";
 -- -- ddl-end --
 -- 
 
@@ -33,8 +33,8 @@ CREATE TABLE public.categories(
 CREATE TABLE public.users(
 	user_id bigserial NOT NULL,
 	email varchar(255) NOT NULL,
-	first_name varchar(50),
-	last_name varchar(50),
+	first_name varchar(50) NOT NULL,
+	last_name varchar(50) NOT NULL,
 	date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	date_updated timestamp,
 	CONSTRAINT users_pk PRIMARY KEY (user_id)
@@ -166,6 +166,60 @@ ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE public.media ADD CONSTRAINT topics_media_fk FOREIGN KEY (topic_id)
 REFERENCES public.topics (topic_id) MATCH FULL
 ON DELETE CASCADE ON UPDATE CASCADE;
+-- ddl-end --
+
+-- object: users_email_idx | type: INDEX --
+-- DROP INDEX IF EXISTS public.users_email_idx CASCADE;
+CREATE INDEX users_email_idx ON public.users
+	USING btree
+	(
+	  email
+	);
+-- ddl-end --
+
+-- object: categories_name_idx | type: INDEX --
+-- DROP INDEX IF EXISTS public.categories_name_idx CASCADE;
+CREATE INDEX categories_name_idx ON public.categories
+	USING btree
+	(
+	  name
+	);
+-- ddl-end --
+
+-- object: topics_title_idx | type: INDEX --
+-- DROP INDEX IF EXISTS public.topics_title_idx CASCADE;
+CREATE INDEX topics_title_idx ON public.topics
+	USING btree
+	(
+	  title
+	);
+-- ddl-end --
+
+-- object: tags_name_idx | type: INDEX --
+-- DROP INDEX IF EXISTS public.tags_name_idx CASCADE;
+CREATE INDEX tags_name_idx ON public.tags
+	USING btree
+	(
+	  name
+	);
+-- ddl-end --
+
+-- object: media_title_idx | type: INDEX --
+-- DROP INDEX IF EXISTS public.media_title_idx CASCADE;
+CREATE INDEX media_title_idx ON public.media
+	USING btree
+	(
+	  title
+	);
+-- ddl-end --
+
+-- object: notes_title_idx | type: INDEX --
+-- DROP INDEX IF EXISTS public.notes_title_idx CASCADE;
+CREATE INDEX notes_title_idx ON public.notes
+	USING btree
+	(
+	  title
+	);
 -- ddl-end --
 
 -- object: categories_created_by_fk | type: CONSTRAINT --

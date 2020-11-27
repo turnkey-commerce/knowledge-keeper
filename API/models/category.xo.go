@@ -179,6 +179,45 @@ func (c *Category) UserByUpdatedBy(db XODB) (*User, error) {
 	return UserByUserID(db, c.UpdatedBy.Int64)
 }
 
+// CategoriesByName retrieves a row from 'public.categories' as a Category.
+//
+// Generated from index 'categories_name_idx'.
+func CategoriesByName(db XODB, name string) ([]*Category, error) {
+	var err error
+
+	// sql query
+	const sqlstr = `SELECT ` +
+		`category_id, name, description, created_by, updated_by, date_created, date_updated ` +
+		`FROM public.categories ` +
+		`WHERE name = $1`
+
+	// run query
+	XOLog(sqlstr, name)
+	q, err := db.Query(sqlstr, name)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	res := []*Category{}
+	for q.Next() {
+		c := Category{
+			_exists: true,
+		}
+
+		// scan
+		err = q.Scan(&c.CategoryID, &c.Name, &c.Description, &c.CreatedBy, &c.UpdatedBy, &c.DateCreated, &c.DateUpdated)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &c)
+	}
+
+	return res, nil
+}
+
 // CategoryByCategoryID retrieves a row from 'public.categories' as a Category.
 //
 // Generated from index 'categories_pk'.

@@ -212,3 +212,42 @@ func TopicByTopicID(db XODB, topicID int64) (*Topic, error) {
 
 	return &t, nil
 }
+
+// TopicsByTitle retrieves a row from 'public.topics' as a Topic.
+//
+// Generated from index 'topics_title_idx'.
+func TopicsByTitle(db XODB, title string) ([]*Topic, error) {
+	var err error
+
+	// sql query
+	const sqlstr = `SELECT ` +
+		`topic_id, category_id, title, description, created_by, updated_by, date_created, date_updated ` +
+		`FROM public.topics ` +
+		`WHERE title = $1`
+
+	// run query
+	XOLog(sqlstr, title)
+	q, err := db.Query(sqlstr, title)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	res := []*Topic{}
+	for q.Next() {
+		t := Topic{
+			_exists: true,
+		}
+
+		// scan
+		err = q.Scan(&t.TopicID, &t.CategoryID, &t.Title, &t.Description, &t.CreatedBy, &t.UpdatedBy, &t.DateCreated, &t.DateUpdated)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &t)
+	}
+
+	return res, nil
+}

@@ -3,9 +3,9 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="0,539" last-zoom="1"
+<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="0,0" last-zoom="1"
 	 default-schema="public">
-<database name="knowledge-keepers" is-template="false" allow-conns="true">
+<database name="knowledge-keeper" is-template="false" allow-conns="true">
 </database>
 
 <schema name="public" fill-color="#e1e1e1" sql-disabled="true">
@@ -49,10 +49,10 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<column name="email" not-null="true">
 		<type name="varchar" length="255"/>
 	</column>
-	<column name="first_name">
+	<column name="first_name" not-null="true">
 		<type name="varchar" length="50"/>
 	</column>
-	<column name="last_name">
+	<column name="last_name" not-null="true">
 		<type name="varchar" length="50"/>
 	</column>
 	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP">
@@ -308,6 +308,54 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		<position x="22.9023" y="-17.6857"/>
 	</label>
 </relationship>
+
+<index name="users_email_idx" table="public.users"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="email"/>
+		</idxelement>
+</index>
+
+<index name="categories_name_idx" table="public.categories"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="name"/>
+		</idxelement>
+</index>
+
+<index name="topics_title_idx" table="public.topics"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="title"/>
+		</idxelement>
+</index>
+
+<index name="tags_name_idx" table="public.tags"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="name"/>
+		</idxelement>
+</index>
+
+<index name="media_title_idx" table="public.media"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="title"/>
+		</idxelement>
+</index>
+
+<index name="notes_title_idx" table="public.notes"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="title"/>
+		</idxelement>
+</index>
 
 <constraint name="categories_created_by_fk" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.users" table="public.categories">

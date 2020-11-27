@@ -212,3 +212,42 @@ func NoteByNoteID(db XODB, noteID int64) (*Note, error) {
 
 	return &n, nil
 }
+
+// NotesByTitle retrieves a row from 'public.notes' as a Note.
+//
+// Generated from index 'notes_title_idx'.
+func NotesByTitle(db XODB, title string) ([]*Note, error) {
+	var err error
+
+	// sql query
+	const sqlstr = `SELECT ` +
+		`note_id, title, description, created_by, updated_by, date_created, date_updated, topic_id ` +
+		`FROM public.notes ` +
+		`WHERE title = $1`
+
+	// run query
+	XOLog(sqlstr, title)
+	q, err := db.Query(sqlstr, title)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	res := []*Note{}
+	for q.Next() {
+		n := Note{
+			_exists: true,
+		}
+
+		// scan
+		err = q.Scan(&n.NoteID, &n.Title, &n.Description, &n.CreatedBy, &n.UpdatedBy, &n.DateCreated, &n.DateUpdated, &n.TopicID)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &n)
+	}
+
+	return res, nil
+}

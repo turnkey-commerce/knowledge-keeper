@@ -178,6 +178,45 @@ func (t *Tag) UserByUpdatedBy(db XODB) (*User, error) {
 	return UserByUserID(db, t.UpdatedBy.Int64)
 }
 
+// TagsByName retrieves a row from 'public.tags' as a Tag.
+//
+// Generated from index 'tags_name_idx'.
+func TagsByName(db XODB, name string) ([]*Tag, error) {
+	var err error
+
+	// sql query
+	const sqlstr = `SELECT ` +
+		`name, tag_id, created_by, updated_by, date_created, date_updated ` +
+		`FROM public.tags ` +
+		`WHERE name = $1`
+
+	// run query
+	XOLog(sqlstr, name)
+	q, err := db.Query(sqlstr, name)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	res := []*Tag{}
+	for q.Next() {
+		t := Tag{
+			_exists: true,
+		}
+
+		// scan
+		err = q.Scan(&t.Name, &t.TagID, &t.CreatedBy, &t.UpdatedBy, &t.DateCreated, &t.DateUpdated)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &t)
+	}
+
+	return res, nil
+}
+
 // TagByTagID retrieves a row from 'public.tags' as a Tag.
 //
 // Generated from index 'tags_pk'.

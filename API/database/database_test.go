@@ -21,7 +21,6 @@ func init() {
 // TestCreateUserAndCategories tests creating a user and adding
 func TestCreateUserAndCategories(t *testing.T) {
 	db, err := sql.Open("knowledge", "identifier")
-
 	defer db.Close()
 
 	if err != nil {
@@ -30,8 +29,8 @@ func TestCreateUserAndCategories(t *testing.T) {
 
 	user := models.User{
 		Email:     "test@test.com",
-		FirstName: sql.NullString{String: "Jack"},
-		LastName:  sql.NullString{String: "Test"},
+		FirstName: "Jack",
+		LastName:  "Test",
 	}
 
 	err = user.Save(db)
@@ -39,8 +38,10 @@ func TestCreateUserAndCategories(t *testing.T) {
 		log.Fatal(err)
 	}
 
+	categoryName := "Special"
+
 	category := models.Category{
-		Name:        "Special",
+		Name:        categoryName,
 		Description: sql.NullString{String: "Special Description"},
 		CreatedBy:   user.UserID,
 	}
@@ -48,5 +49,14 @@ func TestCreateUserAndCategories(t *testing.T) {
 	err = category.Save(db)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	categoriesByName, err := models.CategoriesByName(db, categoryName)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if categoriesByName[0].Name != categoryName {
+		t.Error("Created category name not correct:\n", categoriesByName[0])
 	}
 }
