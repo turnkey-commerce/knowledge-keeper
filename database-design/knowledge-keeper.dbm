@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="0,0" last-zoom="1"
+<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="0,540" last-zoom="1"
 	 default-schema="public">
 <database name="knowledge-keeper" is-template="false" allow-conns="true">
 </database>
@@ -108,7 +108,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 
 <table name="tags">
 	<schema name="public"/>
-	<position x="154" y="825"/>
+	<position x="154" y="819"/>
 	<column name="name" not-null="true">
 		<type name="varchar" length="50"/>
 	</column>
@@ -134,11 +134,11 @@ CAUTION: Do not modify this file unless you know what you are doing.
 
 <table name="topics_tags">
 	<schema name="public"/>
-	<position x="166.5" y="619.5"/>
+	<position x="142.5" y="617.5"/>
 
 	<customidxs object-type="column">
-		<object name="tag_id_tags" index="1"/>
-		<object name="topic_id_topics" index="0"/>
+		<object name="tag_id" index="1"/>
+		<object name="topic_id" index="0"/>
 	</customidxs>
 
 	<customidxs object-type="constraint">
@@ -149,7 +149,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 </table>
 
 <relationship name="topic_tags" type="rel1n"
-	 src-col-pattern="{sc}_{st}"
+	 src-col-pattern="{sc}"
 	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
 	 src-fk-pattern="{st}_fk"
 	 src-table="public.topics"
@@ -160,7 +160,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	upd-action="CASCADE"
 	del-action="CASCADE">
 	<line>
-		<position x="285" y="382"/>
+		<position x="286" y="388"/>
 	</line>
 	<label ref-type="name-label">
 		<position x="-100.526" y="5.82669"/>
@@ -168,7 +168,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 </relationship>
 
 <relationship name="tag_topics" type="rel1n"
-	 src-col-pattern="{sc}_{st}"
+	 src-col-pattern="{sc}"
 	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
 	 src-fk-pattern="{st}_fk"
 	 src-table="public.tags"
@@ -354,6 +354,22 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	 index-type="btree" factor="0">
 		<idxelement use-sorting="false">
 			<column name="title"/>
+		</idxelement>
+</index>
+
+<index name="topics_tags_topic_id_idx" table="public.topics_tags"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="topic_id"/>
+		</idxelement>
+</index>
+
+<index name="topics_tags_tag_id_idx" table="public.topics_tags"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="tag_id"/>
 		</idxelement>
 </index>
 

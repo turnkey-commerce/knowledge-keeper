@@ -86,20 +86,31 @@ func TestCreateTopicAndTags(t *testing.T) {
 	checkError(err)
 
 	topicTag1 := models.TopicsTag{
-		TopicIDTopics: topic.TopicID,
-		TagIDTags:     tag1.TagID,
+		TopicID: topic.TopicID,
+		TagID:   tag1.TagID,
 	}
 
 	err = topicTag1.Insert(db)
 	checkError(err)
 
 	topicTag2 := models.TopicsTag{
-		TopicIDTopics: topic.TopicID,
-		TagIDTags:     tag2.TagID,
+		TopicID: topic.TopicID,
+		TagID:   tag2.TagID,
 	}
 
 	err = topicTag2.Insert(db)
 	checkError(err)
+
+	tagsByTopic, err := models.TopicsTagsByTopicID(db, topic.TopicID)
+	checkError(err)
+
+	if !topicsTagsContains(tagsByTopic, tag1.TagID) {
+		t.Error("Topics Tag Does not contain Tag 1:\n", tag1)
+	}
+
+	if !topicsTagsContains(tagsByTopic, tag2.TagID) {
+		t.Error("Topics Tag Does not contain Tag 2:\n", tag2)
+	}
 
 	topicsByTitle, err := models.TopicsByTitle(db, topicTitle)
 	checkError(err)
@@ -107,7 +118,6 @@ func TestCreateTopicAndTags(t *testing.T) {
 	if topicsByTitle[0].Title != topicTitle {
 		t.Error("Created topic not correct:\n", topicsByTitle[0])
 	}
-
 }
 
 func createUserAndCategory(db *sql.DB, userEmail string, categoryName string) {
@@ -134,4 +144,13 @@ func checkError(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func topicsTagsContains(tt []*models.TopicsTag, tagID int64) bool {
+	for _, t := range tt {
+		if t.TagID == tagID {
+			return true
+		}
+	}
+	return false
 }

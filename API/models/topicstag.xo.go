@@ -9,8 +9,8 @@ import (
 
 // TopicsTag represents a row from 'public.topics_tags'.
 type TopicsTag struct {
-	TopicIDTopics int64 `json:"topic_id_topics"` // topic_id_topics
-	TagIDTags     int64 `json:"tag_id_tags"`     // tag_id_tags
+	TopicID int64 `json:"topic_id"` // topic_id
+	TagID   int64 `json:"tag_id"`   // tag_id
 
 	// xo fields
 	_exists, _deleted bool
@@ -37,14 +37,14 @@ func (tt *TopicsTag) Insert(db XODB) error {
 
 	// sql insert query, primary key must be provided
 	const sqlstr = `INSERT INTO public.topics_tags (` +
-		`topic_id_topics, tag_id_tags` +
+		`topic_id, tag_id` +
 		`) VALUES (` +
 		`$1, $2` +
 		`)`
 
 	// run query
-	XOLog(sqlstr, tt.TopicIDTopics, tt.TagIDTags)
-	_, err = db.Exec(sqlstr, tt.TopicIDTopics, tt.TagIDTags)
+	XOLog(sqlstr, tt.TopicID, tt.TagID)
+	_, err = db.Exec(sqlstr, tt.TopicID, tt.TagID)
 	if err != nil {
 		return err
 	}
@@ -72,11 +72,11 @@ func (tt *TopicsTag) Delete(db XODB) error {
 	}
 
 	// sql query with composite primary key
-	const sqlstr = `DELETE FROM public.topics_tags  WHERE topic_id_topics = $1 AND tag_id_tags = $2`
+	const sqlstr = `DELETE FROM public.topics_tags  WHERE topic_id = $1 AND tag_id = $2`
 
 	// run query
-	XOLog(sqlstr, tt.TopicIDTopics, tt.TagIDTags)
-	_, err = db.Exec(sqlstr, tt.TopicIDTopics, tt.TagIDTags)
+	XOLog(sqlstr, tt.TopicID, tt.TagID)
+	_, err = db.Exec(sqlstr, tt.TopicID, tt.TagID)
 	if err != nil {
 		return err
 	}
@@ -87,42 +87,120 @@ func (tt *TopicsTag) Delete(db XODB) error {
 	return nil
 }
 
-// Tag returns the Tag associated with the TopicsTag's TagIDTags (tag_id_tags).
+// Tag returns the Tag associated with the TopicsTag's TagID (tag_id).
 //
 // Generated from foreign key 'tags_fk'.
 func (tt *TopicsTag) Tag(db XODB) (*Tag, error) {
-	return TagByTagID(db, tt.TagIDTags)
+	return TagByTagID(db, tt.TagID)
 }
 
-// Topic returns the Topic associated with the TopicsTag's TopicIDTopics (topic_id_topics).
+// Topic returns the Topic associated with the TopicsTag's TopicID (topic_id).
 //
 // Generated from foreign key 'topics_fk'.
 func (tt *TopicsTag) Topic(db XODB) (*Topic, error) {
-	return TopicByTopicID(db, tt.TopicIDTopics)
+	return TopicByTopicID(db, tt.TopicID)
 }
 
-// TopicsTagByTopicIDTopicsTagIDTags retrieves a row from 'public.topics_tags' as a TopicsTag.
+// TopicsTagByTopicIDTagID retrieves a row from 'public.topics_tags' as a TopicsTag.
 //
 // Generated from index 'topics_tags_pk'.
-func TopicsTagByTopicIDTopicsTagIDTags(db XODB, topicIDTopics int64, tagIDTags int64) (*TopicsTag, error) {
+func TopicsTagByTopicIDTagID(db XODB, topicID int64, tagID int64) (*TopicsTag, error) {
 	var err error
 
 	// sql query
 	const sqlstr = `SELECT ` +
-		`topic_id_topics, tag_id_tags ` +
+		`topic_id, tag_id ` +
 		`FROM public.topics_tags ` +
-		`WHERE topic_id_topics = $1 AND tag_id_tags = $2`
+		`WHERE topic_id = $1 AND tag_id = $2`
 
 	// run query
-	XOLog(sqlstr, topicIDTopics, tagIDTags)
+	XOLog(sqlstr, topicID, tagID)
 	tt := TopicsTag{
 		_exists: true,
 	}
 
-	err = db.QueryRow(sqlstr, topicIDTopics, tagIDTags).Scan(&tt.TopicIDTopics, &tt.TagIDTags)
+	err = db.QueryRow(sqlstr, topicID, tagID).Scan(&tt.TopicID, &tt.TagID)
 	if err != nil {
 		return nil, err
 	}
 
 	return &tt, nil
+}
+
+// TopicsTagsByTagID retrieves a row from 'public.topics_tags' as a TopicsTag.
+//
+// Generated from index 'topics_tags_tag_id_idx'.
+func TopicsTagsByTagID(db XODB, tagID int64) ([]*TopicsTag, error) {
+	var err error
+
+	// sql query
+	const sqlstr = `SELECT ` +
+		`topic_id, tag_id ` +
+		`FROM public.topics_tags ` +
+		`WHERE tag_id = $1`
+
+	// run query
+	XOLog(sqlstr, tagID)
+	q, err := db.Query(sqlstr, tagID)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	res := []*TopicsTag{}
+	for q.Next() {
+		tt := TopicsTag{
+			_exists: true,
+		}
+
+		// scan
+		err = q.Scan(&tt.TopicID, &tt.TagID)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &tt)
+	}
+
+	return res, nil
+}
+
+// TopicsTagsByTopicID retrieves a row from 'public.topics_tags' as a TopicsTag.
+//
+// Generated from index 'topics_tags_topic_id_idx'.
+func TopicsTagsByTopicID(db XODB, topicID int64) ([]*TopicsTag, error) {
+	var err error
+
+	// sql query
+	const sqlstr = `SELECT ` +
+		`topic_id, tag_id ` +
+		`FROM public.topics_tags ` +
+		`WHERE topic_id = $1`
+
+	// run query
+	XOLog(sqlstr, topicID)
+	q, err := db.Query(sqlstr, topicID)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	res := []*TopicsTag{}
+	for q.Next() {
+		tt := TopicsTag{
+			_exists: true,
+		}
+
+		// scan
+		err = q.Scan(&tt.TopicID, &tt.TagID)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &tt)
+	}
+
+	return res, nil
 }

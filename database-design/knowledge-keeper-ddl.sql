@@ -84,23 +84,23 @@ CREATE TABLE public.tags(
 -- object: public.topics_tags | type: TABLE --
 -- DROP TABLE IF EXISTS public.topics_tags CASCADE;
 CREATE TABLE public.topics_tags(
-	topic_id_topics bigint NOT NULL,
-	tag_id_tags bigint NOT NULL,
-	CONSTRAINT topics_tags_pk PRIMARY KEY (topic_id_topics,tag_id_tags)
+	topic_id bigint NOT NULL,
+	tag_id bigint NOT NULL,
+	CONSTRAINT topics_tags_pk PRIMARY KEY (topic_id,tag_id)
 
 );
 -- ddl-end --
 
 -- object: topics_fk | type: CONSTRAINT --
 -- ALTER TABLE public.topics_tags DROP CONSTRAINT IF EXISTS topics_fk CASCADE;
-ALTER TABLE public.topics_tags ADD CONSTRAINT topics_fk FOREIGN KEY (topic_id_topics)
+ALTER TABLE public.topics_tags ADD CONSTRAINT topics_fk FOREIGN KEY (topic_id)
 REFERENCES public.topics (topic_id) MATCH FULL
 ON DELETE CASCADE ON UPDATE CASCADE;
 -- ddl-end --
 
 -- object: tags_fk | type: CONSTRAINT --
 -- ALTER TABLE public.topics_tags DROP CONSTRAINT IF EXISTS tags_fk CASCADE;
-ALTER TABLE public.topics_tags ADD CONSTRAINT tags_fk FOREIGN KEY (tag_id_tags)
+ALTER TABLE public.topics_tags ADD CONSTRAINT tags_fk FOREIGN KEY (tag_id)
 REFERENCES public.tags (tag_id) MATCH FULL
 ON DELETE CASCADE ON UPDATE CASCADE;
 -- ddl-end --
@@ -219,6 +219,24 @@ CREATE INDEX notes_title_idx ON public.notes
 	USING btree
 	(
 	  title
+	);
+-- ddl-end --
+
+-- object: topics_tags_topic_id_idx | type: INDEX --
+-- DROP INDEX IF EXISTS public.topics_tags_topic_id_idx CASCADE;
+CREATE INDEX topics_tags_topic_id_idx ON public.topics_tags
+	USING btree
+	(
+	  topic_id
+	);
+-- ddl-end --
+
+-- object: topics_tags_tag_id_idx | type: INDEX --
+-- DROP INDEX IF EXISTS public.topics_tags_tag_id_idx CASCADE;
+CREATE INDEX topics_tags_tag_id_idx ON public.topics_tags
+	USING btree
+	(
+	  tag_id
 	);
 -- ddl-end --
 
