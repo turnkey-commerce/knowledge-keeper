@@ -6,19 +6,14 @@ package models
 import (
 	"database/sql"
 	"errors"
-	"time"
-
-	"github.com/lib/pq"
 )
 
 // Tag represents a row from 'public.tags'.
 type Tag struct {
-	Name        string        `json:"name"`         // name
-	TagID       int64         `json:"tag_id"`       // tag_id
-	CreatedBy   int64         `json:"created_by"`   // created_by
-	UpdatedBy   sql.NullInt64 `json:"updated_by"`   // updated_by
-	DateCreated time.Time     `json:"date_created"` // date_created
-	DateUpdated pq.NullTime   `json:"date_updated"` // date_updated
+	Name      string        `json:"name"`       // name
+	TagID     int64         `json:"tag_id"`     // tag_id
+	CreatedBy int64         `json:"created_by"` // created_by
+	UpdatedBy sql.NullInt64 `json:"updated_by"` // updated_by
 
 	// xo fields
 	_exists, _deleted bool
@@ -45,14 +40,14 @@ func (t *Tag) Insert(db XODB) error {
 
 	// sql insert query, primary key provided by sequence
 	const sqlstr = `INSERT INTO public.tags (` +
-		`name, created_by, updated_by, date_created, date_updated` +
+		`name, created_by, updated_by` +
 		`) VALUES (` +
-		`$1, $2, $3, $4, $5` +
+		`$1, $2, $3` +
 		`) RETURNING tag_id`
 
 	// run query
-	XOLog(sqlstr, t.Name, t.CreatedBy, t.UpdatedBy, t.DateCreated, t.DateUpdated)
-	err = db.QueryRow(sqlstr, t.Name, t.CreatedBy, t.UpdatedBy, t.DateCreated, t.DateUpdated).Scan(&t.TagID)
+	XOLog(sqlstr, t.Name, t.CreatedBy, t.UpdatedBy)
+	err = db.QueryRow(sqlstr, t.Name, t.CreatedBy, t.UpdatedBy).Scan(&t.TagID)
 	if err != nil {
 		return err
 	}
@@ -79,14 +74,14 @@ func (t *Tag) Update(db XODB) error {
 
 	// sql query
 	const sqlstr = `UPDATE public.tags SET (` +
-		`name, created_by, updated_by, date_created, date_updated` +
+		`name, created_by, updated_by` +
 		`) = ( ` +
-		`$1, $2, $3, $4, $5` +
-		`) WHERE tag_id = $6`
+		`$1, $2, $3` +
+		`) WHERE tag_id = $4`
 
 	// run query
-	XOLog(sqlstr, t.Name, t.CreatedBy, t.UpdatedBy, t.DateCreated, t.DateUpdated, t.TagID)
-	_, err = db.Exec(sqlstr, t.Name, t.CreatedBy, t.UpdatedBy, t.DateCreated, t.DateUpdated, t.TagID)
+	XOLog(sqlstr, t.Name, t.CreatedBy, t.UpdatedBy, t.TagID)
+	_, err = db.Exec(sqlstr, t.Name, t.CreatedBy, t.UpdatedBy, t.TagID)
 	return err
 }
 
@@ -112,18 +107,18 @@ func (t *Tag) Upsert(db XODB) error {
 
 	// sql query
 	const sqlstr = `INSERT INTO public.tags (` +
-		`name, tag_id, created_by, updated_by, date_created, date_updated` +
+		`name, tag_id, created_by, updated_by` +
 		`) VALUES (` +
-		`$1, $2, $3, $4, $5, $6` +
+		`$1, $2, $3, $4` +
 		`) ON CONFLICT (tag_id) DO UPDATE SET (` +
-		`name, tag_id, created_by, updated_by, date_created, date_updated` +
+		`name, tag_id, created_by, updated_by` +
 		`) = (` +
-		`EXCLUDED.name, EXCLUDED.tag_id, EXCLUDED.created_by, EXCLUDED.updated_by, EXCLUDED.date_created, EXCLUDED.date_updated` +
+		`EXCLUDED.name, EXCLUDED.tag_id, EXCLUDED.created_by, EXCLUDED.updated_by` +
 		`)`
 
 	// run query
-	XOLog(sqlstr, t.Name, t.TagID, t.CreatedBy, t.UpdatedBy, t.DateCreated, t.DateUpdated)
-	_, err = db.Exec(sqlstr, t.Name, t.TagID, t.CreatedBy, t.UpdatedBy, t.DateCreated, t.DateUpdated)
+	XOLog(sqlstr, t.Name, t.TagID, t.CreatedBy, t.UpdatedBy)
+	_, err = db.Exec(sqlstr, t.Name, t.TagID, t.CreatedBy, t.UpdatedBy)
 	if err != nil {
 		return err
 	}
@@ -186,7 +181,7 @@ func TagsByName(db XODB, name string) ([]*Tag, error) {
 
 	// sql query
 	const sqlstr = `SELECT ` +
-		`name, tag_id, created_by, updated_by, date_created, date_updated ` +
+		`name, tag_id, created_by, updated_by ` +
 		`FROM public.tags ` +
 		`WHERE name = $1`
 
@@ -206,7 +201,7 @@ func TagsByName(db XODB, name string) ([]*Tag, error) {
 		}
 
 		// scan
-		err = q.Scan(&t.Name, &t.TagID, &t.CreatedBy, &t.UpdatedBy, &t.DateCreated, &t.DateUpdated)
+		err = q.Scan(&t.Name, &t.TagID, &t.CreatedBy, &t.UpdatedBy)
 		if err != nil {
 			return nil, err
 		}
@@ -225,7 +220,7 @@ func TagByTagID(db XODB, tagID int64) (*Tag, error) {
 
 	// sql query
 	const sqlstr = `SELECT ` +
-		`name, tag_id, created_by, updated_by, date_created, date_updated ` +
+		`name, tag_id, created_by, updated_by ` +
 		`FROM public.tags ` +
 		`WHERE tag_id = $1`
 
@@ -235,7 +230,7 @@ func TagByTagID(db XODB, tagID int64) (*Tag, error) {
 		_exists: true,
 	}
 
-	err = db.QueryRow(sqlstr, tagID).Scan(&t.Name, &t.TagID, &t.CreatedBy, &t.UpdatedBy, &t.DateCreated, &t.DateUpdated)
+	err = db.QueryRow(sqlstr, tagID).Scan(&t.Name, &t.TagID, &t.CreatedBy, &t.UpdatedBy)
 	if err != nil {
 		return nil, err
 	}

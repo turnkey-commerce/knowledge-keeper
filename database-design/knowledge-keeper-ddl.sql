@@ -4,6 +4,9 @@
 -- Project Site: pgmodeler.io
 -- Model Author: James Culbertson
 
+SET check_function_bodies = false;
+-- ddl-end --
+
 
 -- Database creation must be done outside a multicommand file.
 -- These commands were put in this file only as a convenience.
@@ -238,6 +241,77 @@ CREATE INDEX topics_tags_tag_id_idx ON public.topics_tags
 	(
 	  tag_id
 	);
+-- ddl-end --
+
+-- object: public.update_timestamp_column | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS public.update_timestamp_column() CASCADE;
+CREATE FUNCTION public.update_timestamp_column ()
+	RETURNS trigger
+	LANGUAGE plpgsql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 1
+	AS $$
+BEGIN
+   NEW.date_updated = now(); 
+   RETURN NEW;
+END;
+$$;
+-- ddl-end --
+
+-- object: update_date_updated_trigger | type: TRIGGER --
+-- DROP TRIGGER IF EXISTS update_date_updated_trigger ON public.users CASCADE;
+CREATE TRIGGER update_date_updated_trigger
+	BEFORE UPDATE
+	ON public.users
+	FOR EACH ROW
+	EXECUTE PROCEDURE public.update_timestamp_column();
+-- ddl-end --
+
+-- object: update_date_updated_trigger | type: TRIGGER --
+-- DROP TRIGGER IF EXISTS update_date_updated_trigger ON public.categories CASCADE;
+CREATE TRIGGER update_date_updated_trigger
+	BEFORE UPDATE
+	ON public.categories
+	FOR EACH ROW
+	EXECUTE PROCEDURE public.update_timestamp_column();
+-- ddl-end --
+
+-- object: update_date_updated_trigger | type: TRIGGER --
+-- DROP TRIGGER IF EXISTS update_date_updated_trigger ON public.topics CASCADE;
+CREATE TRIGGER update_date_updated_trigger
+	BEFORE UPDATE
+	ON public.topics
+	FOR EACH ROW
+	EXECUTE PROCEDURE public.update_timestamp_column();
+-- ddl-end --
+
+-- object: update_date_updated_trigger | type: TRIGGER --
+-- DROP TRIGGER IF EXISTS update_date_updated_trigger ON public.tags CASCADE;
+CREATE TRIGGER update_date_updated_trigger
+	BEFORE UPDATE
+	ON public.tags
+	FOR EACH ROW
+	EXECUTE PROCEDURE public.update_timestamp_column();
+-- ddl-end --
+
+-- object: update_date_updated_trigger | type: TRIGGER --
+-- DROP TRIGGER IF EXISTS update_date_updated_trigger ON public.media CASCADE;
+CREATE TRIGGER update_date_updated_trigger
+	BEFORE UPDATE
+	ON public.media
+	FOR EACH ROW
+	EXECUTE PROCEDURE public.update_timestamp_column();
+-- ddl-end --
+
+-- object: update_date_updated_trigger | type: TRIGGER --
+-- DROP TRIGGER IF EXISTS update_date_updated_trigger ON public.notes CASCADE;
+CREATE TRIGGER update_date_updated_trigger
+	BEFORE UPDATE
+	ON public.notes
+	FOR EACH ROW
+	EXECUTE PROCEDURE public.update_timestamp_column();
 -- ddl-end --
 
 -- object: categories_created_by_fk | type: CONSTRAINT --

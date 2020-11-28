@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="0,540" last-zoom="1"
+<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="262,441" last-zoom="1"
 	 default-schema="public">
 <database name="knowledge-keeper" is-template="false" allow-conns="true">
 </database>
@@ -287,7 +287,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	upd-action="CASCADE"
 	del-action="CASCADE">
 	<line>
-		<position x="1008" y="379"/>
+		<position x="1017" y="391"/>
 	</line>
 	<label ref-type="name-label">
 		<position x="3.12828" y="-108.061"/>
@@ -372,6 +372,61 @@ CAUTION: Do not modify this file unless you know what you are doing.
 			<column name="tag_id"/>
 		</idxelement>
 </index>
+
+<function name="update_timestamp_column"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<language name="plpgsql" sql-disabled="true"/>
+	<return-type>
+	<type name="trigger" length="0"/>
+	</return-type>
+	<definition><![CDATA[BEGIN
+   NEW.date_updated = now(); 
+   RETURN NEW;
+END;]]></definition>
+</function>
+
+<trigger name="update_date_updated_trigger" firing-type="BEFORE" per-line="true" constraint="false"
+	 ins-event="false" del-event="false" upd-event="true" trunc-event="false"
+	 table="public.users">
+		<function signature="public.update_timestamp_column()"/>
+</trigger>
+
+<trigger name="update_date_updated_trigger" firing-type="BEFORE" per-line="true" constraint="false"
+	 ins-event="false" del-event="false" upd-event="true" trunc-event="false"
+	 table="public.categories">
+		<function signature="public.update_timestamp_column()"/>
+</trigger>
+
+<trigger name="update_date_updated_trigger" firing-type="BEFORE" per-line="true" constraint="false"
+	 ins-event="false" del-event="false" upd-event="true" trunc-event="false"
+	 table="public.topics">
+		<function signature="public.update_timestamp_column()"/>
+</trigger>
+
+<trigger name="update_date_updated_trigger" firing-type="BEFORE" per-line="true" constraint="false"
+	 ins-event="false" del-event="false" upd-event="true" trunc-event="false"
+	 table="public.tags">
+		<function signature="public.update_timestamp_column()"/>
+</trigger>
+
+<trigger name="update_date_updated_trigger" firing-type="BEFORE" per-line="true" constraint="false"
+	 ins-event="false" del-event="false" upd-event="true" trunc-event="false"
+	 table="public.media">
+		<function signature="public.update_timestamp_column()"/>
+</trigger>
+
+<trigger name="update_date_updated_trigger" firing-type="BEFORE" per-line="true" constraint="false"
+	 ins-event="false" del-event="false" upd-event="true" trunc-event="false"
+	 table="public.notes">
+		<function signature="public.update_timestamp_column()"/>
+</trigger>
 
 <constraint name="categories_created_by_fk" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.users" table="public.categories">

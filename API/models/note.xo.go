@@ -6,21 +6,16 @@ package models
 import (
 	"database/sql"
 	"errors"
-	"time"
-
-	"github.com/lib/pq"
 )
 
 // Note represents a row from 'public.notes'.
 type Note struct {
-	NoteID      int64          `json:"note_id"`      // note_id
-	Title       string         `json:"title"`        // title
-	Description sql.NullString `json:"description"`  // description
-	CreatedBy   int64          `json:"created_by"`   // created_by
-	UpdatedBy   sql.NullInt64  `json:"updated_by"`   // updated_by
-	DateCreated time.Time      `json:"date_created"` // date_created
-	DateUpdated pq.NullTime    `json:"date_updated"` // date_updated
-	TopicID     sql.NullInt64  `json:"topic_id"`     // topic_id
+	NoteID      int64          `json:"note_id"`     // note_id
+	Title       string         `json:"title"`       // title
+	Description sql.NullString `json:"description"` // description
+	CreatedBy   int64          `json:"created_by"`  // created_by
+	UpdatedBy   sql.NullInt64  `json:"updated_by"`  // updated_by
+	TopicID     sql.NullInt64  `json:"topic_id"`    // topic_id
 
 	// xo fields
 	_exists, _deleted bool
@@ -47,14 +42,14 @@ func (n *Note) Insert(db XODB) error {
 
 	// sql insert query, primary key provided by sequence
 	const sqlstr = `INSERT INTO public.notes (` +
-		`title, description, created_by, updated_by, date_created, date_updated, topic_id` +
+		`title, description, created_by, updated_by, topic_id` +
 		`) VALUES (` +
-		`$1, $2, $3, $4, $5, $6, $7` +
+		`$1, $2, $3, $4, $5` +
 		`) RETURNING note_id`
 
 	// run query
-	XOLog(sqlstr, n.Title, n.Description, n.CreatedBy, n.UpdatedBy, n.DateCreated, n.DateUpdated, n.TopicID)
-	err = db.QueryRow(sqlstr, n.Title, n.Description, n.CreatedBy, n.UpdatedBy, n.DateCreated, n.DateUpdated, n.TopicID).Scan(&n.NoteID)
+	XOLog(sqlstr, n.Title, n.Description, n.CreatedBy, n.UpdatedBy, n.TopicID)
+	err = db.QueryRow(sqlstr, n.Title, n.Description, n.CreatedBy, n.UpdatedBy, n.TopicID).Scan(&n.NoteID)
 	if err != nil {
 		return err
 	}
@@ -81,14 +76,14 @@ func (n *Note) Update(db XODB) error {
 
 	// sql query
 	const sqlstr = `UPDATE public.notes SET (` +
-		`title, description, created_by, updated_by, date_created, date_updated, topic_id` +
+		`title, description, created_by, updated_by, topic_id` +
 		`) = ( ` +
-		`$1, $2, $3, $4, $5, $6, $7` +
-		`) WHERE note_id = $8`
+		`$1, $2, $3, $4, $5` +
+		`) WHERE note_id = $6`
 
 	// run query
-	XOLog(sqlstr, n.Title, n.Description, n.CreatedBy, n.UpdatedBy, n.DateCreated, n.DateUpdated, n.TopicID, n.NoteID)
-	_, err = db.Exec(sqlstr, n.Title, n.Description, n.CreatedBy, n.UpdatedBy, n.DateCreated, n.DateUpdated, n.TopicID, n.NoteID)
+	XOLog(sqlstr, n.Title, n.Description, n.CreatedBy, n.UpdatedBy, n.TopicID, n.NoteID)
+	_, err = db.Exec(sqlstr, n.Title, n.Description, n.CreatedBy, n.UpdatedBy, n.TopicID, n.NoteID)
 	return err
 }
 
@@ -114,18 +109,18 @@ func (n *Note) Upsert(db XODB) error {
 
 	// sql query
 	const sqlstr = `INSERT INTO public.notes (` +
-		`note_id, title, description, created_by, updated_by, date_created, date_updated, topic_id` +
+		`note_id, title, description, created_by, updated_by, topic_id` +
 		`) VALUES (` +
-		`$1, $2, $3, $4, $5, $6, $7, $8` +
+		`$1, $2, $3, $4, $5, $6` +
 		`) ON CONFLICT (note_id) DO UPDATE SET (` +
-		`note_id, title, description, created_by, updated_by, date_created, date_updated, topic_id` +
+		`note_id, title, description, created_by, updated_by, topic_id` +
 		`) = (` +
-		`EXCLUDED.note_id, EXCLUDED.title, EXCLUDED.description, EXCLUDED.created_by, EXCLUDED.updated_by, EXCLUDED.date_created, EXCLUDED.date_updated, EXCLUDED.topic_id` +
+		`EXCLUDED.note_id, EXCLUDED.title, EXCLUDED.description, EXCLUDED.created_by, EXCLUDED.updated_by, EXCLUDED.topic_id` +
 		`)`
 
 	// run query
-	XOLog(sqlstr, n.NoteID, n.Title, n.Description, n.CreatedBy, n.UpdatedBy, n.DateCreated, n.DateUpdated, n.TopicID)
-	_, err = db.Exec(sqlstr, n.NoteID, n.Title, n.Description, n.CreatedBy, n.UpdatedBy, n.DateCreated, n.DateUpdated, n.TopicID)
+	XOLog(sqlstr, n.NoteID, n.Title, n.Description, n.CreatedBy, n.UpdatedBy, n.TopicID)
+	_, err = db.Exec(sqlstr, n.NoteID, n.Title, n.Description, n.CreatedBy, n.UpdatedBy, n.TopicID)
 	if err != nil {
 		return err
 	}
@@ -195,7 +190,7 @@ func NoteByNoteID(db XODB, noteID int64) (*Note, error) {
 
 	// sql query
 	const sqlstr = `SELECT ` +
-		`note_id, title, description, created_by, updated_by, date_created, date_updated, topic_id ` +
+		`note_id, title, description, created_by, updated_by, topic_id ` +
 		`FROM public.notes ` +
 		`WHERE note_id = $1`
 
@@ -205,7 +200,7 @@ func NoteByNoteID(db XODB, noteID int64) (*Note, error) {
 		_exists: true,
 	}
 
-	err = db.QueryRow(sqlstr, noteID).Scan(&n.NoteID, &n.Title, &n.Description, &n.CreatedBy, &n.UpdatedBy, &n.DateCreated, &n.DateUpdated, &n.TopicID)
+	err = db.QueryRow(sqlstr, noteID).Scan(&n.NoteID, &n.Title, &n.Description, &n.CreatedBy, &n.UpdatedBy, &n.TopicID)
 	if err != nil {
 		return nil, err
 	}
@@ -221,7 +216,7 @@ func NotesByTitle(db XODB, title string) ([]*Note, error) {
 
 	// sql query
 	const sqlstr = `SELECT ` +
-		`note_id, title, description, created_by, updated_by, date_created, date_updated, topic_id ` +
+		`note_id, title, description, created_by, updated_by, topic_id ` +
 		`FROM public.notes ` +
 		`WHERE title = $1`
 
@@ -241,7 +236,7 @@ func NotesByTitle(db XODB, title string) ([]*Note, error) {
 		}
 
 		// scan
-		err = q.Scan(&n.NoteID, &n.Title, &n.Description, &n.CreatedBy, &n.UpdatedBy, &n.DateCreated, &n.DateUpdated, &n.TopicID)
+		err = q.Scan(&n.NoteID, &n.Title, &n.Description, &n.CreatedBy, &n.UpdatedBy, &n.TopicID)
 		if err != nil {
 			return nil, err
 		}

@@ -6,23 +6,18 @@ package models
 import (
 	"database/sql"
 	"errors"
-	"time"
-
-	"github.com/lib/pq"
 )
 
 // Media represents a row from 'public.media'.
 type Media struct {
-	MediaID     int64          `json:"media_id"`     // media_id
-	Type        MediaType      `json:"type"`         // type
-	Title       string         `json:"title"`        // title
-	Description sql.NullString `json:"description"`  // description
-	URL         string         `json:"url"`          // url
-	CreatedBy   int64          `json:"created_by"`   // created_by
-	UpdatedBy   sql.NullInt64  `json:"updated_by"`   // updated_by
-	DateCreated time.Time      `json:"date_created"` // date_created
-	DateUpdated pq.NullTime    `json:"date_updated"` // date_updated
-	TopicID     sql.NullInt64  `json:"topic_id"`     // topic_id
+	MediaID     int64          `json:"media_id"`    // media_id
+	Type        MediaType      `json:"type"`        // type
+	Title       string         `json:"title"`       // title
+	Description sql.NullString `json:"description"` // description
+	URL         string         `json:"url"`         // url
+	CreatedBy   int64          `json:"created_by"`  // created_by
+	UpdatedBy   sql.NullInt64  `json:"updated_by"`  // updated_by
+	TopicID     sql.NullInt64  `json:"topic_id"`    // topic_id
 
 	// xo fields
 	_exists, _deleted bool
@@ -49,14 +44,14 @@ func (m *Media) Insert(db XODB) error {
 
 	// sql insert query, primary key provided by sequence
 	const sqlstr = `INSERT INTO public.media (` +
-		`type, title, description, url, created_by, updated_by, date_created, date_updated, topic_id` +
+		`type, title, description, url, created_by, updated_by, topic_id` +
 		`) VALUES (` +
-		`$1, $2, $3, $4, $5, $6, $7, $8, $9` +
+		`$1, $2, $3, $4, $5, $6, $7` +
 		`) RETURNING media_id`
 
 	// run query
-	XOLog(sqlstr, m.Type, m.Title, m.Description, m.URL, m.CreatedBy, m.UpdatedBy, m.DateCreated, m.DateUpdated, m.TopicID)
-	err = db.QueryRow(sqlstr, m.Type, m.Title, m.Description, m.URL, m.CreatedBy, m.UpdatedBy, m.DateCreated, m.DateUpdated, m.TopicID).Scan(&m.MediaID)
+	XOLog(sqlstr, m.Type, m.Title, m.Description, m.URL, m.CreatedBy, m.UpdatedBy, m.TopicID)
+	err = db.QueryRow(sqlstr, m.Type, m.Title, m.Description, m.URL, m.CreatedBy, m.UpdatedBy, m.TopicID).Scan(&m.MediaID)
 	if err != nil {
 		return err
 	}
@@ -83,14 +78,14 @@ func (m *Media) Update(db XODB) error {
 
 	// sql query
 	const sqlstr = `UPDATE public.media SET (` +
-		`type, title, description, url, created_by, updated_by, date_created, date_updated, topic_id` +
+		`type, title, description, url, created_by, updated_by, topic_id` +
 		`) = ( ` +
-		`$1, $2, $3, $4, $5, $6, $7, $8, $9` +
-		`) WHERE media_id = $10`
+		`$1, $2, $3, $4, $5, $6, $7` +
+		`) WHERE media_id = $8`
 
 	// run query
-	XOLog(sqlstr, m.Type, m.Title, m.Description, m.URL, m.CreatedBy, m.UpdatedBy, m.DateCreated, m.DateUpdated, m.TopicID, m.MediaID)
-	_, err = db.Exec(sqlstr, m.Type, m.Title, m.Description, m.URL, m.CreatedBy, m.UpdatedBy, m.DateCreated, m.DateUpdated, m.TopicID, m.MediaID)
+	XOLog(sqlstr, m.Type, m.Title, m.Description, m.URL, m.CreatedBy, m.UpdatedBy, m.TopicID, m.MediaID)
+	_, err = db.Exec(sqlstr, m.Type, m.Title, m.Description, m.URL, m.CreatedBy, m.UpdatedBy, m.TopicID, m.MediaID)
 	return err
 }
 
@@ -116,18 +111,18 @@ func (m *Media) Upsert(db XODB) error {
 
 	// sql query
 	const sqlstr = `INSERT INTO public.media (` +
-		`media_id, type, title, description, url, created_by, updated_by, date_created, date_updated, topic_id` +
+		`media_id, type, title, description, url, created_by, updated_by, topic_id` +
 		`) VALUES (` +
-		`$1, $2, $3, $4, $5, $6, $7, $8, $9, $10` +
+		`$1, $2, $3, $4, $5, $6, $7, $8` +
 		`) ON CONFLICT (media_id) DO UPDATE SET (` +
-		`media_id, type, title, description, url, created_by, updated_by, date_created, date_updated, topic_id` +
+		`media_id, type, title, description, url, created_by, updated_by, topic_id` +
 		`) = (` +
-		`EXCLUDED.media_id, EXCLUDED.type, EXCLUDED.title, EXCLUDED.description, EXCLUDED.url, EXCLUDED.created_by, EXCLUDED.updated_by, EXCLUDED.date_created, EXCLUDED.date_updated, EXCLUDED.topic_id` +
+		`EXCLUDED.media_id, EXCLUDED.type, EXCLUDED.title, EXCLUDED.description, EXCLUDED.url, EXCLUDED.created_by, EXCLUDED.updated_by, EXCLUDED.topic_id` +
 		`)`
 
 	// run query
-	XOLog(sqlstr, m.MediaID, m.Type, m.Title, m.Description, m.URL, m.CreatedBy, m.UpdatedBy, m.DateCreated, m.DateUpdated, m.TopicID)
-	_, err = db.Exec(sqlstr, m.MediaID, m.Type, m.Title, m.Description, m.URL, m.CreatedBy, m.UpdatedBy, m.DateCreated, m.DateUpdated, m.TopicID)
+	XOLog(sqlstr, m.MediaID, m.Type, m.Title, m.Description, m.URL, m.CreatedBy, m.UpdatedBy, m.TopicID)
+	_, err = db.Exec(sqlstr, m.MediaID, m.Type, m.Title, m.Description, m.URL, m.CreatedBy, m.UpdatedBy, m.TopicID)
 	if err != nil {
 		return err
 	}
@@ -197,7 +192,7 @@ func MediaByMediaID(db XODB, mediaID int64) (*Media, error) {
 
 	// sql query
 	const sqlstr = `SELECT ` +
-		`media_id, type, title, description, url, created_by, updated_by, date_created, date_updated, topic_id ` +
+		`media_id, type, title, description, url, created_by, updated_by, topic_id ` +
 		`FROM public.media ` +
 		`WHERE media_id = $1`
 
@@ -207,7 +202,7 @@ func MediaByMediaID(db XODB, mediaID int64) (*Media, error) {
 		_exists: true,
 	}
 
-	err = db.QueryRow(sqlstr, mediaID).Scan(&m.MediaID, &m.Type, &m.Title, &m.Description, &m.URL, &m.CreatedBy, &m.UpdatedBy, &m.DateCreated, &m.DateUpdated, &m.TopicID)
+	err = db.QueryRow(sqlstr, mediaID).Scan(&m.MediaID, &m.Type, &m.Title, &m.Description, &m.URL, &m.CreatedBy, &m.UpdatedBy, &m.TopicID)
 	if err != nil {
 		return nil, err
 	}
@@ -223,7 +218,7 @@ func MediaByTitle(db XODB, title string) ([]*Media, error) {
 
 	// sql query
 	const sqlstr = `SELECT ` +
-		`media_id, type, title, description, url, created_by, updated_by, date_created, date_updated, topic_id ` +
+		`media_id, type, title, description, url, created_by, updated_by, topic_id ` +
 		`FROM public.media ` +
 		`WHERE title = $1`
 
@@ -243,7 +238,7 @@ func MediaByTitle(db XODB, title string) ([]*Media, error) {
 		}
 
 		// scan
-		err = q.Scan(&m.MediaID, &m.Type, &m.Title, &m.Description, &m.URL, &m.CreatedBy, &m.UpdatedBy, &m.DateCreated, &m.DateUpdated, &m.TopicID)
+		err = q.Scan(&m.MediaID, &m.Type, &m.Title, &m.Description, &m.URL, &m.CreatedBy, &m.UpdatedBy, &m.TopicID)
 		if err != nil {
 			return nil, err
 		}
@@ -262,7 +257,7 @@ func MediaByType(db XODB, typ MediaType) ([]*Media, error) {
 
 	// sql query
 	const sqlstr = `SELECT ` +
-		`media_id, type, title, description, url, created_by, updated_by, date_created, date_updated, topic_id ` +
+		`media_id, type, title, description, url, created_by, updated_by, topic_id ` +
 		`FROM public.media ` +
 		`WHERE type = $1`
 
@@ -282,7 +277,7 @@ func MediaByType(db XODB, typ MediaType) ([]*Media, error) {
 		}
 
 		// scan
-		err = q.Scan(&m.MediaID, &m.Type, &m.Title, &m.Description, &m.URL, &m.CreatedBy, &m.UpdatedBy, &m.DateCreated, &m.DateUpdated, &m.TopicID)
+		err = q.Scan(&m.MediaID, &m.Type, &m.Title, &m.Description, &m.URL, &m.CreatedBy, &m.UpdatedBy, &m.TopicID)
 		if err != nil {
 			return nil, err
 		}

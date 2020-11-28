@@ -6,21 +6,16 @@ package models
 import (
 	"database/sql"
 	"errors"
-	"time"
-
-	"github.com/lib/pq"
 )
 
 // Topic represents a row from 'public.topics'.
 type Topic struct {
-	TopicID     int64          `json:"topic_id"`     // topic_id
-	CategoryID  int64          `json:"category_id"`  // category_id
-	Title       string         `json:"title"`        // title
-	Description sql.NullString `json:"description"`  // description
-	CreatedBy   int64          `json:"created_by"`   // created_by
-	UpdatedBy   sql.NullInt64  `json:"updated_by"`   // updated_by
-	DateCreated time.Time      `json:"date_created"` // date_created
-	DateUpdated pq.NullTime    `json:"date_updated"` // date_updated
+	TopicID     int64          `json:"topic_id"`    // topic_id
+	CategoryID  int64          `json:"category_id"` // category_id
+	Title       string         `json:"title"`       // title
+	Description sql.NullString `json:"description"` // description
+	CreatedBy   int64          `json:"created_by"`  // created_by
+	UpdatedBy   sql.NullInt64  `json:"updated_by"`  // updated_by
 
 	// xo fields
 	_exists, _deleted bool
@@ -47,14 +42,14 @@ func (t *Topic) Insert(db XODB) error {
 
 	// sql insert query, primary key provided by sequence
 	const sqlstr = `INSERT INTO public.topics (` +
-		`category_id, title, description, created_by, updated_by, date_created, date_updated` +
+		`category_id, title, description, created_by, updated_by` +
 		`) VALUES (` +
-		`$1, $2, $3, $4, $5, $6, $7` +
+		`$1, $2, $3, $4, $5` +
 		`) RETURNING topic_id`
 
 	// run query
-	XOLog(sqlstr, t.CategoryID, t.Title, t.Description, t.CreatedBy, t.UpdatedBy, t.DateCreated, t.DateUpdated)
-	err = db.QueryRow(sqlstr, t.CategoryID, t.Title, t.Description, t.CreatedBy, t.UpdatedBy, t.DateCreated, t.DateUpdated).Scan(&t.TopicID)
+	XOLog(sqlstr, t.CategoryID, t.Title, t.Description, t.CreatedBy, t.UpdatedBy)
+	err = db.QueryRow(sqlstr, t.CategoryID, t.Title, t.Description, t.CreatedBy, t.UpdatedBy).Scan(&t.TopicID)
 	if err != nil {
 		return err
 	}
@@ -81,14 +76,14 @@ func (t *Topic) Update(db XODB) error {
 
 	// sql query
 	const sqlstr = `UPDATE public.topics SET (` +
-		`category_id, title, description, created_by, updated_by, date_created, date_updated` +
+		`category_id, title, description, created_by, updated_by` +
 		`) = ( ` +
-		`$1, $2, $3, $4, $5, $6, $7` +
-		`) WHERE topic_id = $8`
+		`$1, $2, $3, $4, $5` +
+		`) WHERE topic_id = $6`
 
 	// run query
-	XOLog(sqlstr, t.CategoryID, t.Title, t.Description, t.CreatedBy, t.UpdatedBy, t.DateCreated, t.DateUpdated, t.TopicID)
-	_, err = db.Exec(sqlstr, t.CategoryID, t.Title, t.Description, t.CreatedBy, t.UpdatedBy, t.DateCreated, t.DateUpdated, t.TopicID)
+	XOLog(sqlstr, t.CategoryID, t.Title, t.Description, t.CreatedBy, t.UpdatedBy, t.TopicID)
+	_, err = db.Exec(sqlstr, t.CategoryID, t.Title, t.Description, t.CreatedBy, t.UpdatedBy, t.TopicID)
 	return err
 }
 
@@ -114,18 +109,18 @@ func (t *Topic) Upsert(db XODB) error {
 
 	// sql query
 	const sqlstr = `INSERT INTO public.topics (` +
-		`topic_id, category_id, title, description, created_by, updated_by, date_created, date_updated` +
+		`topic_id, category_id, title, description, created_by, updated_by` +
 		`) VALUES (` +
-		`$1, $2, $3, $4, $5, $6, $7, $8` +
+		`$1, $2, $3, $4, $5, $6` +
 		`) ON CONFLICT (topic_id) DO UPDATE SET (` +
-		`topic_id, category_id, title, description, created_by, updated_by, date_created, date_updated` +
+		`topic_id, category_id, title, description, created_by, updated_by` +
 		`) = (` +
-		`EXCLUDED.topic_id, EXCLUDED.category_id, EXCLUDED.title, EXCLUDED.description, EXCLUDED.created_by, EXCLUDED.updated_by, EXCLUDED.date_created, EXCLUDED.date_updated` +
+		`EXCLUDED.topic_id, EXCLUDED.category_id, EXCLUDED.title, EXCLUDED.description, EXCLUDED.created_by, EXCLUDED.updated_by` +
 		`)`
 
 	// run query
-	XOLog(sqlstr, t.TopicID, t.CategoryID, t.Title, t.Description, t.CreatedBy, t.UpdatedBy, t.DateCreated, t.DateUpdated)
-	_, err = db.Exec(sqlstr, t.TopicID, t.CategoryID, t.Title, t.Description, t.CreatedBy, t.UpdatedBy, t.DateCreated, t.DateUpdated)
+	XOLog(sqlstr, t.TopicID, t.CategoryID, t.Title, t.Description, t.CreatedBy, t.UpdatedBy)
+	_, err = db.Exec(sqlstr, t.TopicID, t.CategoryID, t.Title, t.Description, t.CreatedBy, t.UpdatedBy)
 	if err != nil {
 		return err
 	}
@@ -195,7 +190,7 @@ func TopicByTopicID(db XODB, topicID int64) (*Topic, error) {
 
 	// sql query
 	const sqlstr = `SELECT ` +
-		`topic_id, category_id, title, description, created_by, updated_by, date_created, date_updated ` +
+		`topic_id, category_id, title, description, created_by, updated_by ` +
 		`FROM public.topics ` +
 		`WHERE topic_id = $1`
 
@@ -205,7 +200,7 @@ func TopicByTopicID(db XODB, topicID int64) (*Topic, error) {
 		_exists: true,
 	}
 
-	err = db.QueryRow(sqlstr, topicID).Scan(&t.TopicID, &t.CategoryID, &t.Title, &t.Description, &t.CreatedBy, &t.UpdatedBy, &t.DateCreated, &t.DateUpdated)
+	err = db.QueryRow(sqlstr, topicID).Scan(&t.TopicID, &t.CategoryID, &t.Title, &t.Description, &t.CreatedBy, &t.UpdatedBy)
 	if err != nil {
 		return nil, err
 	}
@@ -221,7 +216,7 @@ func TopicsByTitle(db XODB, title string) ([]*Topic, error) {
 
 	// sql query
 	const sqlstr = `SELECT ` +
-		`topic_id, category_id, title, description, created_by, updated_by, date_created, date_updated ` +
+		`topic_id, category_id, title, description, created_by, updated_by ` +
 		`FROM public.topics ` +
 		`WHERE title = $1`
 
@@ -241,7 +236,7 @@ func TopicsByTitle(db XODB, title string) ([]*Topic, error) {
 		}
 
 		// scan
-		err = q.Scan(&t.TopicID, &t.CategoryID, &t.Title, &t.Description, &t.CreatedBy, &t.UpdatedBy, &t.DateCreated, &t.DateUpdated)
+		err = q.Scan(&t.TopicID, &t.CategoryID, &t.Title, &t.Description, &t.CreatedBy, &t.UpdatedBy)
 		if err != nil {
 			return nil, err
 		}

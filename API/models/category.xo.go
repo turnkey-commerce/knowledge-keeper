@@ -6,20 +6,15 @@ package models
 import (
 	"database/sql"
 	"errors"
-	"time"
-
-	"github.com/lib/pq"
 )
 
 // Category represents a row from 'public.categories'.
 type Category struct {
-	CategoryID  int64          `json:"category_id"`  // category_id
-	Name        string         `json:"name"`         // name
-	Description sql.NullString `json:"description"`  // description
-	CreatedBy   int64          `json:"created_by"`   // created_by
-	UpdatedBy   sql.NullInt64  `json:"updated_by"`   // updated_by
-	DateCreated time.Time      `json:"date_created"` // date_created
-	DateUpdated pq.NullTime    `json:"date_updated"` // date_updated
+	CategoryID  int64          `json:"category_id"` // category_id
+	Name        string         `json:"name"`        // name
+	Description sql.NullString `json:"description"` // description
+	CreatedBy   int64          `json:"created_by"`  // created_by
+	UpdatedBy   sql.NullInt64  `json:"updated_by"`  // updated_by
 
 	// xo fields
 	_exists, _deleted bool
@@ -46,14 +41,14 @@ func (c *Category) Insert(db XODB) error {
 
 	// sql insert query, primary key provided by sequence
 	const sqlstr = `INSERT INTO public.categories (` +
-		`name, description, created_by, updated_by, date_created, date_updated` +
+		`name, description, created_by, updated_by` +
 		`) VALUES (` +
-		`$1, $2, $3, $4, $5, $6` +
+		`$1, $2, $3, $4` +
 		`) RETURNING category_id`
 
 	// run query
-	XOLog(sqlstr, c.Name, c.Description, c.CreatedBy, c.UpdatedBy, c.DateCreated, c.DateUpdated)
-	err = db.QueryRow(sqlstr, c.Name, c.Description, c.CreatedBy, c.UpdatedBy, c.DateCreated, c.DateUpdated).Scan(&c.CategoryID)
+	XOLog(sqlstr, c.Name, c.Description, c.CreatedBy, c.UpdatedBy)
+	err = db.QueryRow(sqlstr, c.Name, c.Description, c.CreatedBy, c.UpdatedBy).Scan(&c.CategoryID)
 	if err != nil {
 		return err
 	}
@@ -80,14 +75,14 @@ func (c *Category) Update(db XODB) error {
 
 	// sql query
 	const sqlstr = `UPDATE public.categories SET (` +
-		`name, description, created_by, updated_by, date_created, date_updated` +
+		`name, description, created_by, updated_by` +
 		`) = ( ` +
-		`$1, $2, $3, $4, $5, $6` +
-		`) WHERE category_id = $7`
+		`$1, $2, $3, $4` +
+		`) WHERE category_id = $5`
 
 	// run query
-	XOLog(sqlstr, c.Name, c.Description, c.CreatedBy, c.UpdatedBy, c.DateCreated, c.DateUpdated, c.CategoryID)
-	_, err = db.Exec(sqlstr, c.Name, c.Description, c.CreatedBy, c.UpdatedBy, c.DateCreated, c.DateUpdated, c.CategoryID)
+	XOLog(sqlstr, c.Name, c.Description, c.CreatedBy, c.UpdatedBy, c.CategoryID)
+	_, err = db.Exec(sqlstr, c.Name, c.Description, c.CreatedBy, c.UpdatedBy, c.CategoryID)
 	return err
 }
 
@@ -113,18 +108,18 @@ func (c *Category) Upsert(db XODB) error {
 
 	// sql query
 	const sqlstr = `INSERT INTO public.categories (` +
-		`category_id, name, description, created_by, updated_by, date_created, date_updated` +
+		`category_id, name, description, created_by, updated_by` +
 		`) VALUES (` +
-		`$1, $2, $3, $4, $5, $6, $7` +
+		`$1, $2, $3, $4, $5` +
 		`) ON CONFLICT (category_id) DO UPDATE SET (` +
-		`category_id, name, description, created_by, updated_by, date_created, date_updated` +
+		`category_id, name, description, created_by, updated_by` +
 		`) = (` +
-		`EXCLUDED.category_id, EXCLUDED.name, EXCLUDED.description, EXCLUDED.created_by, EXCLUDED.updated_by, EXCLUDED.date_created, EXCLUDED.date_updated` +
+		`EXCLUDED.category_id, EXCLUDED.name, EXCLUDED.description, EXCLUDED.created_by, EXCLUDED.updated_by` +
 		`)`
 
 	// run query
-	XOLog(sqlstr, c.CategoryID, c.Name, c.Description, c.CreatedBy, c.UpdatedBy, c.DateCreated, c.DateUpdated)
-	_, err = db.Exec(sqlstr, c.CategoryID, c.Name, c.Description, c.CreatedBy, c.UpdatedBy, c.DateCreated, c.DateUpdated)
+	XOLog(sqlstr, c.CategoryID, c.Name, c.Description, c.CreatedBy, c.UpdatedBy)
+	_, err = db.Exec(sqlstr, c.CategoryID, c.Name, c.Description, c.CreatedBy, c.UpdatedBy)
 	if err != nil {
 		return err
 	}
@@ -187,7 +182,7 @@ func CategoriesByName(db XODB, name string) ([]*Category, error) {
 
 	// sql query
 	const sqlstr = `SELECT ` +
-		`category_id, name, description, created_by, updated_by, date_created, date_updated ` +
+		`category_id, name, description, created_by, updated_by ` +
 		`FROM public.categories ` +
 		`WHERE name = $1`
 
@@ -207,7 +202,7 @@ func CategoriesByName(db XODB, name string) ([]*Category, error) {
 		}
 
 		// scan
-		err = q.Scan(&c.CategoryID, &c.Name, &c.Description, &c.CreatedBy, &c.UpdatedBy, &c.DateCreated, &c.DateUpdated)
+		err = q.Scan(&c.CategoryID, &c.Name, &c.Description, &c.CreatedBy, &c.UpdatedBy)
 		if err != nil {
 			return nil, err
 		}
@@ -226,7 +221,7 @@ func CategoryByCategoryID(db XODB, categoryID int64) (*Category, error) {
 
 	// sql query
 	const sqlstr = `SELECT ` +
-		`category_id, name, description, created_by, updated_by, date_created, date_updated ` +
+		`category_id, name, description, created_by, updated_by ` +
 		`FROM public.categories ` +
 		`WHERE category_id = $1`
 
@@ -236,7 +231,7 @@ func CategoryByCategoryID(db XODB, categoryID int64) (*Category, error) {
 		_exists: true,
 	}
 
-	err = db.QueryRow(sqlstr, categoryID).Scan(&c.CategoryID, &c.Name, &c.Description, &c.CreatedBy, &c.UpdatedBy, &c.DateCreated, &c.DateUpdated)
+	err = db.QueryRow(sqlstr, categoryID).Scan(&c.CategoryID, &c.Name, &c.Description, &c.CreatedBy, &c.UpdatedBy)
 	if err != nil {
 		return nil, err
 	}

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	txdb "github.com/DATA-DOG/go-txdb"
+	_ "github.com/lib/pq"
 	"github.com/turnkey-commerce/knowledge-keeper/models"
 	"github.com/xo/dburl"
 )

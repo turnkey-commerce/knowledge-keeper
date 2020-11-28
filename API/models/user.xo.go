@@ -5,19 +5,14 @@ package models
 
 import (
 	"errors"
-	"time"
-
-	"github.com/lib/pq"
 )
 
 // User represents a row from 'public.users'.
 type User struct {
-	UserID      int64       `json:"user_id"`      // user_id
-	Email       string      `json:"email"`        // email
-	FirstName   string      `json:"first_name"`   // first_name
-	LastName    string      `json:"last_name"`    // last_name
-	DateCreated time.Time   `json:"date_created"` // date_created
-	DateUpdated pq.NullTime `json:"date_updated"` // date_updated
+	UserID    int64  `json:"user_id"`    // user_id
+	Email     string `json:"email"`      // email
+	FirstName string `json:"first_name"` // first_name
+	LastName  string `json:"last_name"`  // last_name
 
 	// xo fields
 	_exists, _deleted bool
@@ -44,14 +39,14 @@ func (u *User) Insert(db XODB) error {
 
 	// sql insert query, primary key provided by sequence
 	const sqlstr = `INSERT INTO public.users (` +
-		`email, first_name, last_name, date_created, date_updated` +
+		`email, first_name, last_name` +
 		`) VALUES (` +
-		`$1, $2, $3, $4, $5` +
+		`$1, $2, $3` +
 		`) RETURNING user_id`
 
 	// run query
-	XOLog(sqlstr, u.Email, u.FirstName, u.LastName, u.DateCreated, u.DateUpdated)
-	err = db.QueryRow(sqlstr, u.Email, u.FirstName, u.LastName, u.DateCreated, u.DateUpdated).Scan(&u.UserID)
+	XOLog(sqlstr, u.Email, u.FirstName, u.LastName)
+	err = db.QueryRow(sqlstr, u.Email, u.FirstName, u.LastName).Scan(&u.UserID)
 	if err != nil {
 		return err
 	}
@@ -78,14 +73,14 @@ func (u *User) Update(db XODB) error {
 
 	// sql query
 	const sqlstr = `UPDATE public.users SET (` +
-		`email, first_name, last_name, date_created, date_updated` +
+		`email, first_name, last_name` +
 		`) = ( ` +
-		`$1, $2, $3, $4, $5` +
-		`) WHERE user_id = $6`
+		`$1, $2, $3` +
+		`) WHERE user_id = $4`
 
 	// run query
-	XOLog(sqlstr, u.Email, u.FirstName, u.LastName, u.DateCreated, u.DateUpdated, u.UserID)
-	_, err = db.Exec(sqlstr, u.Email, u.FirstName, u.LastName, u.DateCreated, u.DateUpdated, u.UserID)
+	XOLog(sqlstr, u.Email, u.FirstName, u.LastName, u.UserID)
+	_, err = db.Exec(sqlstr, u.Email, u.FirstName, u.LastName, u.UserID)
 	return err
 }
 
@@ -111,18 +106,18 @@ func (u *User) Upsert(db XODB) error {
 
 	// sql query
 	const sqlstr = `INSERT INTO public.users (` +
-		`user_id, email, first_name, last_name, date_created, date_updated` +
+		`user_id, email, first_name, last_name` +
 		`) VALUES (` +
-		`$1, $2, $3, $4, $5, $6` +
+		`$1, $2, $3, $4` +
 		`) ON CONFLICT (user_id) DO UPDATE SET (` +
-		`user_id, email, first_name, last_name, date_created, date_updated` +
+		`user_id, email, first_name, last_name` +
 		`) = (` +
-		`EXCLUDED.user_id, EXCLUDED.email, EXCLUDED.first_name, EXCLUDED.last_name, EXCLUDED.date_created, EXCLUDED.date_updated` +
+		`EXCLUDED.user_id, EXCLUDED.email, EXCLUDED.first_name, EXCLUDED.last_name` +
 		`)`
 
 	// run query
-	XOLog(sqlstr, u.UserID, u.Email, u.FirstName, u.LastName, u.DateCreated, u.DateUpdated)
-	_, err = db.Exec(sqlstr, u.UserID, u.Email, u.FirstName, u.LastName, u.DateCreated, u.DateUpdated)
+	XOLog(sqlstr, u.UserID, u.Email, u.FirstName, u.LastName)
+	_, err = db.Exec(sqlstr, u.UserID, u.Email, u.FirstName, u.LastName)
 	if err != nil {
 		return err
 	}
@@ -171,7 +166,7 @@ func UsersByEmail(db XODB, email string) ([]*User, error) {
 
 	// sql query
 	const sqlstr = `SELECT ` +
-		`user_id, email, first_name, last_name, date_created, date_updated ` +
+		`user_id, email, first_name, last_name ` +
 		`FROM public.users ` +
 		`WHERE email = $1`
 
@@ -191,7 +186,7 @@ func UsersByEmail(db XODB, email string) ([]*User, error) {
 		}
 
 		// scan
-		err = q.Scan(&u.UserID, &u.Email, &u.FirstName, &u.LastName, &u.DateCreated, &u.DateUpdated)
+		err = q.Scan(&u.UserID, &u.Email, &u.FirstName, &u.LastName)
 		if err != nil {
 			return nil, err
 		}
@@ -210,7 +205,7 @@ func UserByUserID(db XODB, userID int64) (*User, error) {
 
 	// sql query
 	const sqlstr = `SELECT ` +
-		`user_id, email, first_name, last_name, date_created, date_updated ` +
+		`user_id, email, first_name, last_name ` +
 		`FROM public.users ` +
 		`WHERE user_id = $1`
 
@@ -220,7 +215,7 @@ func UserByUserID(db XODB, userID int64) (*User, error) {
 		_exists: true,
 	}
 
-	err = db.QueryRow(sqlstr, userID).Scan(&u.UserID, &u.Email, &u.FirstName, &u.LastName, &u.DateCreated, &u.DateUpdated)
+	err = db.QueryRow(sqlstr, userID).Scan(&u.UserID, &u.Email, &u.FirstName, &u.LastName)
 	if err != nil {
 		return nil, err
 	}

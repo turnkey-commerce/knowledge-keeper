@@ -31,7 +31,7 @@ IgnoreTables = []
 
 # IgnoreFields sets a comma-separated list of column names to ignore.
 # e.g. ["time_created", "time_updated"]
-IgnoreFields = []
+IgnoreFields = ["date_created", "date_updated"]
 
 # TemplatePath sets the path for user-defined templates.
 TemplatePath = ""
