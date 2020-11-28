@@ -314,6 +314,26 @@ CREATE TRIGGER update_date_updated_trigger
 	EXECUTE PROCEDURE public.update_timestamp_column();
 -- ddl-end --
 
+-- object: public.tag_topics_view | type: VIEW --
+-- DROP VIEW IF EXISTS public.tag_topics_view CASCADE;
+CREATE VIEW public.tag_topics_view
+AS 
+
+SELECT tag_id, topics.*
+    FROM topics_tags LEFT JOIN topics
+      ON topics_tags.topic_id = topics.topic_id;
+-- ddl-end --
+
+-- object: public.topics_tags_view | type: VIEW --
+-- DROP VIEW IF EXISTS public.topics_tags_view CASCADE;
+CREATE VIEW public.topics_tags_view
+AS 
+
+SELECT topic_id, tags.*
+    FROM topics_tags LEFT JOIN tags
+      ON topics_tags.tag_id = tags.tag_id;
+-- ddl-end --
+
 -- object: categories_created_by_fk | type: CONSTRAINT --
 -- ALTER TABLE public.categories DROP CONSTRAINT IF EXISTS categories_created_by_fk CASCADE;
 ALTER TABLE public.categories ADD CONSTRAINT categories_created_by_fk FOREIGN KEY (created_by)

@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="262,441" last-zoom="1"
+<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="15,580" last-zoom="1"
 	 default-schema="public">
 <database name="knowledge-keeper" is-template="false" allow-conns="true">
 </database>
@@ -427,6 +427,26 @@ END;]]></definition>
 	 table="public.notes">
 		<function signature="public.update_timestamp_column()"/>
 </trigger>
+
+<view name="tag_topics_view">
+	<schema name="public"/>
+	<position x="115" y="1046"/>
+	<reference>
+		<expression><![CDATA[SELECT tag_id, topics.*
+    FROM topics_tags LEFT JOIN topics
+      ON topics_tags.topic_id = topics.topic_id]]></expression>
+	</reference>
+</view>
+
+<view name="topics_tags_view">
+	<schema name="public"/>
+	<position x="324" y="1044"/>
+	<reference>
+		<expression><![CDATA[ SELECT topic_id, tags.*
+    FROM topics_tags LEFT JOIN tags
+      ON topics_tags.tag_id = tags.tag_id]]></expression>
+	</reference>
+</view>
 
 <constraint name="categories_created_by_fk" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.users" table="public.categories">
