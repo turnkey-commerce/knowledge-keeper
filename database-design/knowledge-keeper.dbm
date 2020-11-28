@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="15,580" last-zoom="1"
+<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="14,0" last-zoom="1"
 	 default-schema="public">
 <database name="knowledge-keeper" is-template="false" allow-conns="true">
 </database>
@@ -108,7 +108,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 
 <table name="tags">
 	<schema name="public"/>
-	<position x="154" y="819"/>
+	<position x="126" y="815"/>
 	<column name="name" not-null="true">
 		<type name="varchar" length="50"/>
 	</column>
@@ -134,7 +134,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 
 <table name="topics_tags">
 	<schema name="public"/>
-	<position x="142.5" y="617.5"/>
+	<position x="168.5" y="616.5"/>
 
 	<customidxs object-type="column">
 		<object name="tag_id" index="1"/>
@@ -354,22 +354,6 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	 index-type="btree" factor="0">
 		<idxelement use-sorting="false">
 			<column name="title"/>
-		</idxelement>
-</index>
-
-<index name="topics_tags_topic_id_idx" table="public.topics_tags"
-	 concurrent="false" unique="false" fast-update="false" buffering="false"
-	 index-type="btree" factor="0">
-		<idxelement use-sorting="false">
-			<column name="topic_id"/>
-		</idxelement>
-</index>
-
-<index name="topics_tags_tag_id_idx" table="public.topics_tags"
-	 concurrent="false" unique="false" fast-update="false" buffering="false"
-	 index-type="btree" factor="0">
-		<idxelement use-sorting="false">
-			<column name="tag_id"/>
 		</idxelement>
 </index>
 

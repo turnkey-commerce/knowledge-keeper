@@ -8,6 +8,7 @@ import (
 	txdb "github.com/DATA-DOG/go-txdb"
 	_ "github.com/lib/pq"
 	"github.com/turnkey-commerce/knowledge-keeper/models"
+	"github.com/turnkey-commerce/knowledge-keeper/models/queries"
 	"github.com/xo/dburl"
 )
 
@@ -46,9 +47,10 @@ func TestCreateUserAndCategories(t *testing.T) {
 func TestCreateTopicAndTags(t *testing.T) {
 	categoryName := "Special"
 	userEmail := "test@test.com"
-	topicTitle := "Test Topic"
-	tagName1 := "Tag 1"
-	tagName2 := "Tag 2"
+	topicTitle1 := "A Test Topic"
+	topicTitle2 := "B Test Topic"
+	tagName1 := "A Tag"
+	tagName2 := "B Tag"
 
 	db, err := sql.Open("knowledge", "identifier")
 	defer db.Close()
@@ -60,14 +62,24 @@ func TestCreateTopicAndTags(t *testing.T) {
 	checkError(err)
 	usersByEmail, err := models.UsersByEmail(db, userEmail)
 	checkError(err)
-	topic := models.Topic{
-		Title:       topicTitle,
-		Description: sql.NullString{String: "Topic Description"},
+	topic1 := models.Topic{
+		Title:       topicTitle1,
+		Description: sql.NullString{String: "Topic1 Description"},
 		CategoryID:  categoriesByName[0].CategoryID,
 		CreatedBy:   usersByEmail[0].UserID,
 	}
 
-	err = topic.Save(db)
+	topic2 := models.Topic{
+		Title:       topicTitle2,
+		Description: sql.NullString{String: "Topic2 Description"},
+		CategoryID:  categoriesByName[0].CategoryID,
+		CreatedBy:   usersByEmail[0].UserID,
+	}
+
+	err = topic1.Save(db)
+	checkError(err)
+
+	err = topic2.Save(db)
 	checkError(err)
 
 	tag1 := models.Tag{
@@ -86,37 +98,56 @@ func TestCreateTopicAndTags(t *testing.T) {
 	err = tag2.Save(db)
 	checkError(err)
 
-	topicTag1 := models.TopicsTag{
-		TopicID: topic.TopicID,
+	topic1Tag1 := models.TopicsTag{
+		TopicID: topic1.TopicID,
 		TagID:   tag1.TagID,
 	}
 
-	err = topicTag1.Insert(db)
+	err = topic1Tag1.Insert(db)
 	checkError(err)
 
-	topicTag2 := models.TopicsTag{
-		TopicID: topic.TopicID,
+	topic2Tag1 := models.TopicsTag{
+		TopicID: topic2.TopicID,
+		TagID:   tag1.TagID,
+	}
+
+	err = topic2Tag1.Insert(db)
+	checkError(err)
+
+	topic1Tag2 := models.TopicsTag{
+		TopicID: topic1.TopicID,
 		TagID:   tag2.TagID,
 	}
 
-	err = topicTag2.Insert(db)
+	err = topic1Tag2.Insert(db)
 	checkError(err)
 
-	tagsByTopic, err := models.TopicsTagsByTopicID(db, topic.TopicID)
+	topicsByTag, err := queries.TopicsByTagID(db, tag1.TagID)
 	checkError(err)
 
-	if !topicsTagsContains(tagsByTopic, tag1.TagID) {
-		t.Error("Topics Tag Does not contain Tag 1:\n", tag1)
+	if topicsByTag[0].Title.String != topicTitle1 {
+		t.Error("TopicsByTag wrong topic:\n", topicsByTag[0])
 	}
 
-	if !topicsTagsContains(tagsByTopic, tag2.TagID) {
-		t.Error("Topics Tag Does not contain Tag 2:\n", tag2)
+	if topicsByTag[1].Title.String != topicTitle2 {
+		t.Error("TopicsByTag wrong topic:\n", topicsByTag[1])
 	}
 
-	topicsByTitle, err := models.TopicsByTitle(db, topicTitle)
+	tagsByTopic, err := queries.TagsByTopicID(db, topic1.TopicID)
 	checkError(err)
 
-	if topicsByTitle[0].Title != topicTitle {
+	if tagsByTopic[0].Name.String != tagName1 {
+		t.Error("TagsByTopic wrong tag:\n", tagsByTopic[0])
+	}
+
+	if tagsByTopic[1].Name.String != tagName2 {
+		t.Error("TagsByTopic wrong topic:\n", tagsByTopic[1])
+	}
+
+	topicsByTitle, err := models.TopicsByTitle(db, topicTitle1)
+	checkError(err)
+
+	if topicsByTitle[0].Title != topicTitle1 {
 		t.Error("Created topic not correct:\n", topicsByTitle[0])
 	}
 }
@@ -145,13 +176,4 @@ func checkError(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func topicsTagsContains(tt []*models.TopicsTag, tagID int64) bool {
-	for _, t := range tt {
-		if t.TagID == tagID {
-			return true
-		}
-	}
-	return false
 }

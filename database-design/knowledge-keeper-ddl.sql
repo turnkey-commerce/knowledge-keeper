@@ -225,24 +225,6 @@ CREATE INDEX notes_title_idx ON public.notes
 	);
 -- ddl-end --
 
--- object: topics_tags_topic_id_idx | type: INDEX --
--- DROP INDEX IF EXISTS public.topics_tags_topic_id_idx CASCADE;
-CREATE INDEX topics_tags_topic_id_idx ON public.topics_tags
-	USING btree
-	(
-	  topic_id
-	);
--- ddl-end --
-
--- object: topics_tags_tag_id_idx | type: INDEX --
--- DROP INDEX IF EXISTS public.topics_tags_tag_id_idx CASCADE;
-CREATE INDEX topics_tags_tag_id_idx ON public.topics_tags
-	USING btree
-	(
-	  tag_id
-	);
--- ddl-end --
-
 -- object: public.update_timestamp_column | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS public.update_timestamp_column() CASCADE;
 CREATE FUNCTION public.update_timestamp_column ()
