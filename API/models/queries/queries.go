@@ -78,3 +78,40 @@ func TagsByTopicID(db models.XODB, topicID int64) ([]*models.TopicsTagsView, err
 
 	return res, nil
 }
+
+// RelatedTopicsByTopicId retrieves all Topics related to a given TopicId.
+//
+func RelatedTopicsByTopicId(db models.XODB, tagID int64) ([]*models.RelatedTopicsView, error) {
+	var err error
+
+	// sql query
+	const sqlstr = `SELECT ` +
+		`topic_id, related_topic_id, category_id, title, description, created_by, updated_by ` +
+		`FROM public.related_topics_view ` +
+		`WHERE topic_id = $1` +
+		`ORDER BY title`
+
+	// run query
+	models.XOLog(sqlstr, tagID)
+	q, err := db.Query(sqlstr, tagID)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	res := []*models.RelatedTopicsView{}
+	for q.Next() {
+		t := models.RelatedTopicsView{}
+
+		// scan
+		err = q.Scan(&t.TopicID, &t.RelatedTopicID, &t.CategoryID, &t.Title, &t.Description, &t.CreatedBy, &t.UpdatedBy)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &t)
+	}
+
+	return res, nil
+}

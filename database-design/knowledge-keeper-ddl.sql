@@ -316,6 +316,34 @@ SELECT topic_id, tags.*
       ON topics_tags.tag_id = tags.tag_id;
 -- ddl-end --
 
+-- object: public.related_topics | type: TABLE --
+-- DROP TABLE IF EXISTS public.related_topics CASCADE;
+CREATE TABLE public.related_topics(
+	topic_id bigint NOT NULL,
+	related_topic_id bigint NOT NULL,
+	CONSTRAINT related_topics_pk PRIMARY KEY (topic_id,related_topic_id)
+
+);
+-- ddl-end --
+
+-- object: public.related_topics_view | type: VIEW --
+-- DROP VIEW IF EXISTS public.related_topics_view CASCADE;
+CREATE VIEW public.related_topics_view
+AS 
+
+SELECT topics.topic_id,
+    related_topics.related_topic_id,
+    topics.category_id,
+    topics.title,
+    topics.description,
+    topics.created_by,
+    topics.updated_by,
+    topics.date_created,
+    topics.date_updated
+   FROM (related_topics
+     LEFT JOIN topics ON ((related_topics.topic_id = topics.topic_id)));
+-- ddl-end --
+
 -- object: categories_created_by_fk | type: CONSTRAINT --
 -- ALTER TABLE public.categories DROP CONSTRAINT IF EXISTS categories_created_by_fk CASCADE;
 ALTER TABLE public.categories ADD CONSTRAINT categories_created_by_fk FOREIGN KEY (created_by)
@@ -390,6 +418,20 @@ ON DELETE NO ACTION ON UPDATE NO ACTION;
 -- ALTER TABLE public.notes DROP CONSTRAINT IF EXISTS notes_updated_by_fk CASCADE;
 ALTER TABLE public.notes ADD CONSTRAINT notes_updated_by_fk FOREIGN KEY (updated_by)
 REFERENCES public.users (user_id) MATCH FULL
+ON DELETE NO ACTION ON UPDATE NO ACTION;
+-- ddl-end --
+
+-- object: topic_fk | type: CONSTRAINT --
+-- ALTER TABLE public.related_topics DROP CONSTRAINT IF EXISTS topic_fk CASCADE;
+ALTER TABLE public.related_topics ADD CONSTRAINT topic_fk FOREIGN KEY (topic_id)
+REFERENCES public.topics (topic_id) MATCH FULL
+ON DELETE NO ACTION ON UPDATE NO ACTION;
+-- ddl-end --
+
+-- object: related_topic_fk | type: CONSTRAINT --
+-- ALTER TABLE public.related_topics DROP CONSTRAINT IF EXISTS related_topic_fk CASCADE;
+ALTER TABLE public.related_topics ADD CONSTRAINT related_topic_fk FOREIGN KEY (related_topic_id)
+REFERENCES public.topics (topic_id) MATCH FULL
 ON DELETE NO ACTION ON UPDATE NO ACTION;
 -- ddl-end --
 

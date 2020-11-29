@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="14,0" last-zoom="1"
+<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="0,0" last-zoom="1"
 	 default-schema="public">
 <database name="knowledge-keeper" is-template="false" allow-conns="true">
 </database>
@@ -76,7 +76,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 
 <table name="topics">
 	<schema name="public"/>
-	<position x="533" y="280"/>
+	<position x="523" y="280"/>
 	<column name="topic_id" not-null="true">
 		<type name="bigserial" length="0"/>
 	</column>
@@ -287,7 +287,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	upd-action="CASCADE"
 	del-action="CASCADE">
 	<line>
-		<position x="1017" y="391"/>
+		<position x="1042" y="397"/>
 	</line>
 	<label ref-type="name-label">
 		<position x="3.12828" y="-108.061"/>
@@ -432,6 +432,38 @@ END;]]></definition>
 	</reference>
 </view>
 
+<table name="related_topics">
+	<schema name="public"/>
+	<position x="948" y="281"/>
+	<column name="topic_id" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="related_topic_id" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<constraint name="related_topics_pk" type="pk-constr" table="public.related_topics">
+		<columns names="topic_id,related_topic_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<view name="related_topics_view">
+	<schema name="public"/>
+	<position x="1057" y="449"/>
+	<reference>
+		<expression><![CDATA[ SELECT topics.topic_id,
+    related_topics.related_topic_id,
+    topics.category_id,
+    topics.title,
+    topics.description,
+    topics.created_by,
+    topics.updated_by,
+    topics.date_created,
+    topics.date_updated
+   FROM (related_topics
+     LEFT JOIN topics ON ((related_topics.topic_id = topics.topic_id)));]]></expression>
+	</reference>
+</view>
+
 <constraint name="categories_created_by_fk" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.users" table="public.categories">
 	<columns names="created_by" ref-type="src-columns"/>
@@ -498,6 +530,18 @@ END;]]></definition>
 	<columns names="user_id" ref-type="dst-columns"/>
 </constraint>
 
+<constraint name="topic_fk" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.topics" table="public.related_topics">
+	<columns names="topic_id" ref-type="src-columns"/>
+	<columns names="topic_id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="related_topic_fk" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.topics" table="public.related_topics">
+	<columns names="related_topic_id" ref-type="src-columns"/>
+	<columns names="topic_id" ref-type="dst-columns"/>
+</constraint>
+
 <relationship name="categories_created_by" type="relfk"
 	 src-table="public.categories"
 	 dst-table="public.users" reference-fk="categories_created_by_fk"
@@ -521,7 +565,7 @@ END;]]></definition>
 	 dst-table="public.categories" reference-fk="topics_category_fk"
 	 src-required="false" dst-required="false">
 	<label ref-type="name-label">
-		<position x="0" y="0"/>
+		<position x="48.6845" y="-23.0266"/>
 	</label>
 </relationship>
 
@@ -572,7 +616,7 @@ END;]]></definition>
 	 dst-table="public.users" reference-fk="media_created_by_fk"
 	 src-required="false" dst-required="false">
 	<line>
-		<position x="648" y="549"/>
+		<position x="649" y="552"/>
 	<position x="25" y="550"/>
 	</line>
 	<label ref-type="name-label">
@@ -598,8 +642,8 @@ END;]]></definition>
 	 dst-table="public.users" reference-fk="notes_created_by_fk"
 	 src-required="false" dst-required="false">
 	<line>
-		<position x="876" y="536"/>
-	<position x="26" y="533"/>
+		<position x="878" y="541"/>
+	<position x="24" y="538"/>
 	</line>
 	<label ref-type="name-label">
 		<position x="424.974" y="6.59844"/>
@@ -611,11 +655,29 @@ END;]]></definition>
 	 dst-table="public.users" reference-fk="notes_updated_by_fk"
 	 src-required="false" dst-required="false">
 	<line>
-		<position x="953" y="519"/>
-	<position x="23" y="518"/>
+		<position x="962" y="533"/>
+	<position x="25" y="530"/>
 	</line>
 	<label ref-type="name-label">
 		<position x="383.474" y="-25.4016"/>
+	</label>
+</relationship>
+
+<relationship name="topic" type="relfk"
+	 src-table="public.related_topics"
+	 dst-table="public.topics" reference-fk="topic_fk"
+	 src-required="false" dst-required="false">
+	<label ref-type="name-label">
+		<position x="26.1092" y="-3.69432"/>
+	</label>
+</relationship>
+
+<relationship name="related_topic" type="relfk"
+	 src-table="public.related_topics"
+	 dst-table="public.topics" reference-fk="related_topic_fk"
+	 src-required="false" dst-required="false">
+	<label ref-type="name-label">
+		<position x="66.6092" y="-11.2319"/>
 	</label>
 </relationship>
 
