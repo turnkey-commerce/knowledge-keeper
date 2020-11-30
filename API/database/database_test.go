@@ -56,40 +56,17 @@ func TestCreateTopicAndTags(t *testing.T) {
 	defer db.Close()
 	checkError(err)
 
-	createUserAndCategory(db, userEmail, categoryName)
-
-	categoriesByName, err := models.CategoriesByName(db, categoryName)
-	checkError(err)
-	usersByEmail, err := models.UsersByEmail(db, userEmail)
-	checkError(err)
-	topic1 := models.Topic{
-		Title:       topicTitle1,
-		Description: sql.NullString{String: "Topic1 Description"},
-		CategoryID:  categoriesByName[0].CategoryID,
-		CreatedBy:   usersByEmail[0].UserID,
-	}
-
-	topic2 := models.Topic{
-		Title:       topicTitle2,
-		Description: sql.NullString{String: "Topic2 Description"},
-		CategoryID:  categoriesByName[0].CategoryID,
-		CreatedBy:   usersByEmail[0].UserID,
-	}
-
-	err = topic1.Save(db)
-	checkError(err)
-
-	err = topic2.Save(db)
-	checkError(err)
+	userID, categoryID := createUserAndCategory(db, userEmail, categoryName)
+	topicID1, topicID2 := createTopics(db, topicTitle1, topicTitle2, categoryID, userID)
 
 	tag1 := models.Tag{
 		Name:      tagName1,
-		CreatedBy: usersByEmail[0].UserID,
+		CreatedBy: userID,
 	}
 
 	tag2 := models.Tag{
 		Name:      tagName2,
-		CreatedBy: usersByEmail[0].UserID,
+		CreatedBy: userID,
 	}
 
 	err = tag1.Save(db)
@@ -99,7 +76,7 @@ func TestCreateTopicAndTags(t *testing.T) {
 	checkError(err)
 
 	topic1Tag1 := models.TopicsTag{
-		TopicID: topic1.TopicID,
+		TopicID: topicID1,
 		TagID:   tag1.TagID,
 	}
 
@@ -107,7 +84,7 @@ func TestCreateTopicAndTags(t *testing.T) {
 	checkError(err)
 
 	topic2Tag1 := models.TopicsTag{
-		TopicID: topic2.TopicID,
+		TopicID: topicID2,
 		TagID:   tag1.TagID,
 	}
 
@@ -115,7 +92,7 @@ func TestCreateTopicAndTags(t *testing.T) {
 	checkError(err)
 
 	topic1Tag2 := models.TopicsTag{
-		TopicID: topic1.TopicID,
+		TopicID: topicID1,
 		TagID:   tag2.TagID,
 	}
 
@@ -133,7 +110,7 @@ func TestCreateTopicAndTags(t *testing.T) {
 		t.Error("TopicsByTag wrong topic:\n", topicsByTag[1])
 	}
 
-	tagsByTopic, err := queries.TagsByTopicID(db, topic1.TopicID)
+	tagsByTopic, err := queries.TagsByTopicID(db, topicID1)
 	checkError(err)
 
 	if tagsByTopic[0].Name.String != tagName1 {
@@ -152,7 +129,35 @@ func TestCreateTopicAndTags(t *testing.T) {
 	}
 }
 
-func createUserAndCategory(db *sql.DB, userEmail string, categoryName string) {
+func TestCreateRelatedTopics(t *testing.T) {
+	categoryName := "Special"
+	userEmail := "test@test.com"
+	topicTitle1 := "A Test Topic"
+	topicTitle2 := "B Test Topic"
+
+	db, err := sql.Open("knowledge", "identifier")
+	defer db.Close()
+	checkError(err)
+
+	userID, categoryID := createUserAndCategory(db, userEmail, categoryName)
+	topicID1, topicID2 := createTopics(db, topicTitle1, topicTitle2, categoryID, userID)
+
+	relatedTopic := models.RelatedTopic{
+		TopicID:        topicID1,
+		RelatedTopicID: topicID2,
+	}
+
+	err = relatedTopic.Insert(db)
+	checkError(err)
+
+	relatedTopics, err := queries.RelatedTopicsByTopicId(db, topicID1)
+	if relatedTopics[0].Title.String != topicTitle2 {
+		t.Error("Wrong related topic:\n", relatedTopics[0])
+	}
+
+}
+
+func createUserAndCategory(db *sql.DB, userEmail string, categoryName string) (int64, int64) {
 	user := models.User{
 		Email:     userEmail,
 		FirstName: "Jack",
@@ -170,6 +175,33 @@ func createUserAndCategory(db *sql.DB, userEmail string, categoryName string) {
 
 	err = category.Save(db)
 	checkError(err)
+
+	return user.UserID, category.CategoryID
+}
+
+func createTopics(db *sql.DB, topicTitle1 string, topicTitle2 string,
+	categoryID int64, userID int64) (int64, int64) {
+	topic1 := models.Topic{
+		Title:       topicTitle1,
+		Description: sql.NullString{String: "Topic1 Description"},
+		CategoryID:  categoryID,
+		CreatedBy:   userID,
+	}
+
+	topic2 := models.Topic{
+		Title:       topicTitle2,
+		Description: sql.NullString{String: "Topic2 Description"},
+		CategoryID:  categoryID,
+		CreatedBy:   userID,
+	}
+
+	err := topic1.Save(db)
+	checkError(err)
+
+	err = topic2.Save(db)
+	checkError(err)
+
+	return topic1.TopicID, topic2.TopicID
 }
 
 func checkError(err error) {

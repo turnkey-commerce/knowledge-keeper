@@ -331,7 +331,7 @@ CREATE TABLE public.related_topics(
 CREATE VIEW public.related_topics_view
 AS 
 
-SELECT topics.topic_id,
+SELECT related_topics.topic_id,
     related_topics.related_topic_id,
     topics.category_id,
     topics.title,
@@ -340,8 +340,8 @@ SELECT topics.topic_id,
     topics.updated_by,
     topics.date_created,
     topics.date_updated
-   FROM (related_topics
-     LEFT JOIN topics ON ((related_topics.topic_id = topics.topic_id)));
+   FROM related_topics
+     LEFT JOIN topics ON (related_topics.related_topic_id = topics.topic_id);
 -- ddl-end --
 
 -- object: categories_created_by_fk | type: CONSTRAINT --

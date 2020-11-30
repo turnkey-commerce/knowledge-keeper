@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="0,0" last-zoom="1"
+<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="0,90" last-zoom="1"
 	 default-schema="public">
 <database name="knowledge-keeper" is-template="false" allow-conns="true">
 </database>
@@ -450,7 +450,7 @@ END;]]></definition>
 	<schema name="public"/>
 	<position x="1057" y="449"/>
 	<reference>
-		<expression><![CDATA[ SELECT topics.topic_id,
+		<expression><![CDATA[SELECT related_topics.topic_id,
     related_topics.related_topic_id,
     topics.category_id,
     topics.title,
@@ -459,8 +459,8 @@ END;]]></definition>
     topics.updated_by,
     topics.date_created,
     topics.date_updated
-   FROM (related_topics
-     LEFT JOIN topics ON ((related_topics.topic_id = topics.topic_id)));]]></expression>
+   FROM related_topics
+     LEFT JOIN topics ON (related_topics.related_topic_id = topics.topic_id)]]></expression>
 	</reference>
 </view>
 
