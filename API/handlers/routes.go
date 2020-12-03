@@ -6,5 +6,7 @@ import (
 
 // GetRoutes routes to the handlers
 func (h *Handler) GetRoutes(e *echo.Echo) {
-	e.GET("/hello", h.GetHello)
+	e.GET("/users/email/:email", h.GetUserByEmail)
+	e.POST("/users", h.SaveUser)
+	e.PUT("/users/:id", h.UpdateUser)
 }
