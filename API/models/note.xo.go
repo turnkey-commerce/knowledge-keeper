@@ -161,6 +161,38 @@ func (n *Note) Delete(db XODB) error {
 	return nil
 }
 
+// GetRecentPaginatedNotes returns rows from 'public.notes',
+// that are paginated by the limit and offset inputs.
+func GetRecentPaginatedNotes(db XODB, limit int, offset int) ([]*Note, error) {
+	const sqlstr = `SELECT ` +
+		`note_id, title, description, created_by, updated_by, topic_id, date_created ` +
+		`FROM public.notes ` +
+		`ORDER BY date_created DESC ` +
+		`LIMIT $1 OFFSET $2`
+
+	q, err := db.Query(sqlstr, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	var res []*Note
+	for q.Next() {
+		n := Note{}
+
+		// scan
+		err = q.Scan(&n.NoteID, &n.Title, &n.Description, &n.CreatedBy, &n.UpdatedBy, &n.TopicID)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &n)
+	}
+
+	return res, nil
+}
+
 // UserByCreatedBy returns the User associated with the Note's CreatedBy (created_by).
 //
 // Generated from foreign key 'notes_created_by_fk'.

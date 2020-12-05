@@ -87,6 +87,38 @@ func (rt *RelatedTopic) Delete(db XODB) error {
 	return nil
 }
 
+// GetRecentPaginatedRelatedTopics returns rows from 'public.related_topics',
+// that are paginated by the limit and offset inputs.
+func GetRecentPaginatedRelatedTopics(db XODB, limit int, offset int) ([]*RelatedTopic, error) {
+	const sqlstr = `SELECT ` +
+		`topic_id, related_topic_id, date_created ` +
+		`FROM public.related_topics ` +
+		`ORDER BY date_created DESC ` +
+		`LIMIT $1 OFFSET $2`
+
+	q, err := db.Query(sqlstr, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	var res []*RelatedTopic
+	for q.Next() {
+		rt := RelatedTopic{}
+
+		// scan
+		err = q.Scan(&rt.TopicID, &rt.RelatedTopicID)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &rt)
+	}
+
+	return res, nil
+}
+
 // TopicByRelatedTopicID returns the Topic associated with the RelatedTopic's RelatedTopicID (related_topic_id).
 //
 // Generated from foreign key 'related_topic_fk'.

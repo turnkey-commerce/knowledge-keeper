@@ -34,7 +34,7 @@ IgnoreTables = []
 IgnoreFields = ["date_created", "date_updated"]
 
 # TemplatePath sets the path for user-defined templates.
-TemplatePath = ""
+TemplatePath = "templates"
 
 # Suffix is the file suffix for the generated files.
 Suffix = ".xo.go"

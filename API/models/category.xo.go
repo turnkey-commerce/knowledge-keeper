@@ -160,6 +160,38 @@ func (c *Category) Delete(db XODB) error {
 	return nil
 }
 
+// GetRecentPaginatedCategorys returns rows from 'public.categories',
+// that are paginated by the limit and offset inputs.
+func GetRecentPaginatedCategorys(db XODB, limit int, offset int) ([]*Category, error) {
+	const sqlstr = `SELECT ` +
+		`category_id, name, description, created_by, updated_by, date_created ` +
+		`FROM public.categories ` +
+		`ORDER BY date_created DESC ` +
+		`LIMIT $1 OFFSET $2`
+
+	q, err := db.Query(sqlstr, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	var res []*Category
+	for q.Next() {
+		c := Category{}
+
+		// scan
+		err = q.Scan(&c.CategoryID, &c.Name, &c.Description, &c.CreatedBy, &c.UpdatedBy)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &c)
+	}
+
+	return res, nil
+}
+
 // UserByCreatedBy returns the User associated with the Category's CreatedBy (created_by).
 //
 // Generated from foreign key 'categories_created_by_fk'.

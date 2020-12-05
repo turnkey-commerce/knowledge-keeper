@@ -87,6 +87,38 @@ func (tt *TopicsTag) Delete(db XODB) error {
 	return nil
 }
 
+// GetRecentPaginatedTopicsTags returns rows from 'public.topics_tags',
+// that are paginated by the limit and offset inputs.
+func GetRecentPaginatedTopicsTags(db XODB, limit int, offset int) ([]*TopicsTag, error) {
+	const sqlstr = `SELECT ` +
+		`topic_id, tag_id, date_created ` +
+		`FROM public.topics_tags ` +
+		`ORDER BY date_created DESC ` +
+		`LIMIT $1 OFFSET $2`
+
+	q, err := db.Query(sqlstr, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	var res []*TopicsTag
+	for q.Next() {
+		tt := TopicsTag{}
+
+		// scan
+		err = q.Scan(&tt.TopicID, &tt.TagID)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &tt)
+	}
+
+	return res, nil
+}
+
 // Tag returns the Tag associated with the TopicsTag's TagID (tag_id).
 //
 // Generated from foreign key 'tags_fk'.

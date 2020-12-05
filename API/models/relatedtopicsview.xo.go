@@ -17,3 +17,35 @@ type RelatedTopicsView struct {
 	CreatedBy      sql.NullInt64  `json:"created_by"`       // created_by
 	UpdatedBy      sql.NullInt64  `json:"updated_by"`       // updated_by
 }
+
+// GetRecentPaginatedRelatedTopicsViews returns rows from 'public.related_topics_view',
+// that are paginated by the limit and offset inputs.
+func GetRecentPaginatedRelatedTopicsViews(db XODB, limit int, offset int) ([]*RelatedTopicsView, error) {
+	const sqlstr = `SELECT ` +
+		`topic_id, related_topic_id, category_id, title, description, created_by, updated_by, date_created ` +
+		`FROM public.related_topics_view ` +
+		`ORDER BY date_created DESC ` +
+		`LIMIT $1 OFFSET $2`
+
+	q, err := db.Query(sqlstr, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	var res []*RelatedTopicsView
+	for q.Next() {
+		rtv := RelatedTopicsView{}
+
+		// scan
+		err = q.Scan(&rtv.TopicID, &rtv.RelatedTopicID, &rtv.CategoryID, &rtv.Title, &rtv.Description, &rtv.CreatedBy, &rtv.UpdatedBy)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &rtv)
+	}
+
+	return res, nil
+}

@@ -163,6 +163,38 @@ func (m *Media) Delete(db XODB) error {
 	return nil
 }
 
+// GetRecentPaginatedMedias returns rows from 'public.media',
+// that are paginated by the limit and offset inputs.
+func GetRecentPaginatedMedias(db XODB, limit int, offset int) ([]*Media, error) {
+	const sqlstr = `SELECT ` +
+		`media_id, type, title, description, url, created_by, updated_by, topic_id, date_created ` +
+		`FROM public.media ` +
+		`ORDER BY date_created DESC ` +
+		`LIMIT $1 OFFSET $2`
+
+	q, err := db.Query(sqlstr, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	var res []*Media
+	for q.Next() {
+		m := Media{}
+
+		// scan
+		err = q.Scan(&m.MediaID, &m.Type, &m.Title, &m.Description, &m.URL, &m.CreatedBy, &m.UpdatedBy, &m.TopicID)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &m)
+	}
+
+	return res, nil
+}
+
 // UserByCreatedBy returns the User associated with the Media's CreatedBy (created_by).
 //
 // Generated from foreign key 'media_created_by_fk'.

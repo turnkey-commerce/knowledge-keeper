@@ -158,6 +158,38 @@ func (u *User) Delete(db XODB) error {
 	return nil
 }
 
+// GetRecentPaginatedUsers returns rows from 'public.users',
+// that are paginated by the limit and offset inputs.
+func GetRecentPaginatedUsers(db XODB, limit int, offset int) ([]*User, error) {
+	const sqlstr = `SELECT ` +
+		`user_id, email, first_name, last_name, date_created ` +
+		`FROM public.users ` +
+		`ORDER BY date_created DESC ` +
+		`LIMIT $1 OFFSET $2`
+
+	q, err := db.Query(sqlstr, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	var res []*User
+	for q.Next() {
+		u := User{}
+
+		// scan
+		err = q.Scan(&u.UserID, &u.Email, &u.FirstName, &u.LastName)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &u)
+	}
+
+	return res, nil
+}
+
 // UsersByEmail retrieves a row from 'public.users' as a User.
 //
 // Generated from index 'users_email_idx'.

@@ -161,6 +161,38 @@ func (t *Topic) Delete(db XODB) error {
 	return nil
 }
 
+// GetRecentPaginatedTopics returns rows from 'public.topics',
+// that are paginated by the limit and offset inputs.
+func GetRecentPaginatedTopics(db XODB, limit int, offset int) ([]*Topic, error) {
+	const sqlstr = `SELECT ` +
+		`topic_id, category_id, title, description, created_by, updated_by, date_created ` +
+		`FROM public.topics ` +
+		`ORDER BY date_created DESC ` +
+		`LIMIT $1 OFFSET $2`
+
+	q, err := db.Query(sqlstr, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	var res []*Topic
+	for q.Next() {
+		t := Topic{}
+
+		// scan
+		err = q.Scan(&t.TopicID, &t.CategoryID, &t.Title, &t.Description, &t.CreatedBy, &t.UpdatedBy)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &t)
+	}
+
+	return res, nil
+}
+
 // Category returns the Category associated with the Topic's CategoryID (category_id).
 //
 // Generated from foreign key 'topics_category_fk'.

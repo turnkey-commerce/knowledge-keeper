@@ -159,6 +159,38 @@ func (t *Tag) Delete(db XODB) error {
 	return nil
 }
 
+// GetRecentPaginatedTags returns rows from 'public.tags',
+// that are paginated by the limit and offset inputs.
+func GetRecentPaginatedTags(db XODB, limit int, offset int) ([]*Tag, error) {
+	const sqlstr = `SELECT ` +
+		`name, tag_id, created_by, updated_by, date_created ` +
+		`FROM public.tags ` +
+		`ORDER BY date_created DESC ` +
+		`LIMIT $1 OFFSET $2`
+
+	q, err := db.Query(sqlstr, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	var res []*Tag
+	for q.Next() {
+		t := Tag{}
+
+		// scan
+		err = q.Scan(&t.Name, &t.TagID, &t.CreatedBy, &t.UpdatedBy)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &t)
+	}
+
+	return res, nil
+}
+
 // UserByCreatedBy returns the User associated with the Tag's CreatedBy (created_by).
 //
 // Generated from foreign key 'tags_created_by_fk'.

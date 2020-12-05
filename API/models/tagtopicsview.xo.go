@@ -17,3 +17,35 @@ type TagTopicsView struct {
 	CreatedBy   sql.NullInt64  `json:"created_by"`  // created_by
 	UpdatedBy   sql.NullInt64  `json:"updated_by"`  // updated_by
 }
+
+// GetRecentPaginatedTagTopicsViews returns rows from 'public.tag_topics_view',
+// that are paginated by the limit and offset inputs.
+func GetRecentPaginatedTagTopicsViews(db XODB, limit int, offset int) ([]*TagTopicsView, error) {
+	const sqlstr = `SELECT ` +
+		`tag_id, topic_id, category_id, title, description, created_by, updated_by, date_created ` +
+		`FROM public.tag_topics_view ` +
+		`ORDER BY date_created DESC ` +
+		`LIMIT $1 OFFSET $2`
+
+	q, err := db.Query(sqlstr, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	var res []*TagTopicsView
+	for q.Next() {
+		ttv := TagTopicsView{}
+
+		// scan
+		err = q.Scan(&ttv.TagID, &ttv.TopicID, &ttv.CategoryID, &ttv.Title, &ttv.Description, &ttv.CreatedBy, &ttv.UpdatedBy)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &ttv)
+	}
+
+	return res, nil
+}

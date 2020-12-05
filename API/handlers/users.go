@@ -9,6 +9,18 @@ import (
 )
 
 // GetUserByEmail returns the user by email address.
+func (h *Handler) GetRecentUsersPaginated(c echo.Context) error {
+	limit, _ := strconv.Atoi(c.QueryParam("limit"))
+	offset, _ := strconv.Atoi(c.QueryParam("offset"))
+	users, err := models.GetRecentPaginatedUsers(h.DB, limit, offset)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "Can't find recent users: "+err.Error())
+	}
+
+	return c.JSON(http.StatusOK, users)
+}
+
+// GetUserByEmail returns the user by email address.
 func (h *Handler) GetUserByEmail(c echo.Context) error {
 	email := c.Param("email")
 	users, err := models.UsersByEmail(h.DB, email)
