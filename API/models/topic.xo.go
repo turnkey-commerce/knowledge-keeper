@@ -165,7 +165,7 @@ func (t *Topic) Delete(db XODB) error {
 // that are paginated by the limit and offset inputs.
 func GetRecentPaginatedTopics(db XODB, limit int, offset int) ([]*Topic, error) {
 	const sqlstr = `SELECT ` +
-		`topic_id, category_id, title, description, created_by, updated_by, date_created ` +
+		`topic_id, category_id, title, description, created_by, updated_by ` +
 		`FROM public.topics ` +
 		`ORDER BY date_created DESC ` +
 		`LIMIT $1 OFFSET $2`

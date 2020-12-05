@@ -22,7 +22,7 @@ type TagTopicsView struct {
 // that are paginated by the limit and offset inputs.
 func GetRecentPaginatedTagTopicsViews(db XODB, limit int, offset int) ([]*TagTopicsView, error) {
 	const sqlstr = `SELECT ` +
-		`tag_id, topic_id, category_id, title, description, created_by, updated_by, date_created ` +
+		`tag_id, topic_id, category_id, title, description, created_by, updated_by ` +
 		`FROM public.tag_topics_view ` +
 		`ORDER BY date_created DESC ` +
 		`LIMIT $1 OFFSET $2`

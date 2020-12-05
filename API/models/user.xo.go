@@ -162,7 +162,7 @@ func (u *User) Delete(db XODB) error {
 // that are paginated by the limit and offset inputs.
 func GetRecentPaginatedUsers(db XODB, limit int, offset int) ([]*User, error) {
 	const sqlstr = `SELECT ` +
-		`user_id, email, first_name, last_name, date_created ` +
+		`user_id, email, first_name, last_name ` +
 		`FROM public.users ` +
 		`ORDER BY date_created DESC ` +
 		`LIMIT $1 OFFSET $2`

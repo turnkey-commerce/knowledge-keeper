@@ -163,7 +163,7 @@ func (t *Tag) Delete(db XODB) error {
 // that are paginated by the limit and offset inputs.
 func GetRecentPaginatedTags(db XODB, limit int, offset int) ([]*Tag, error) {
 	const sqlstr = `SELECT ` +
-		`name, tag_id, created_by, updated_by, date_created ` +
+		`name, tag_id, created_by, updated_by ` +
 		`FROM public.tags ` +
 		`ORDER BY date_created DESC ` +
 		`LIMIT $1 OFFSET $2`

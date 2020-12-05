@@ -241,7 +241,7 @@ func ({{ $short }} *{{ .Name }}) Delete(db XODB) error {
 // that are paginated by the limit and offset inputs.
 func GetRecentPaginated{{ .Name }}s(db XODB, limit int, offset int) ([]*{{ .Name }}, error) {
     const sqlstr = `SELECT ` +
-        `{{ colnames .Fields }}, date_created ` + 
+        `{{ colnames .Fields }} ` + 
 		`FROM {{ $table }} ` +
 		`ORDER BY date_created DESC ` +
         `LIMIT $1 OFFSET $2`

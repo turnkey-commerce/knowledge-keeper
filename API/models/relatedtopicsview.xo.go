@@ -22,7 +22,7 @@ type RelatedTopicsView struct {
 // that are paginated by the limit and offset inputs.
 func GetRecentPaginatedRelatedTopicsViews(db XODB, limit int, offset int) ([]*RelatedTopicsView, error) {
 	const sqlstr = `SELECT ` +
-		`topic_id, related_topic_id, category_id, title, description, created_by, updated_by, date_created ` +
+		`topic_id, related_topic_id, category_id, title, description, created_by, updated_by ` +
 		`FROM public.related_topics_view ` +
 		`ORDER BY date_created DESC ` +
 		`LIMIT $1 OFFSET $2`

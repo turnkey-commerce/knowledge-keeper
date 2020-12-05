@@ -165,7 +165,7 @@ func (n *Note) Delete(db XODB) error {
 // that are paginated by the limit and offset inputs.
 func GetRecentPaginatedNotes(db XODB, limit int, offset int) ([]*Note, error) {
 	const sqlstr = `SELECT ` +
-		`note_id, title, description, created_by, updated_by, topic_id, date_created ` +
+		`note_id, title, description, created_by, updated_by, topic_id ` +
 		`FROM public.notes ` +
 		`ORDER BY date_created DESC ` +
 		`LIMIT $1 OFFSET $2`

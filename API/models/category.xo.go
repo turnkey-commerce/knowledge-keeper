@@ -164,7 +164,7 @@ func (c *Category) Delete(db XODB) error {
 // that are paginated by the limit and offset inputs.
 func GetRecentPaginatedCategorys(db XODB, limit int, offset int) ([]*Category, error) {
 	const sqlstr = `SELECT ` +
-		`category_id, name, description, created_by, updated_by, date_created ` +
+		`category_id, name, description, created_by, updated_by ` +
 		`FROM public.categories ` +
 		`ORDER BY date_created DESC ` +
 		`LIMIT $1 OFFSET $2`

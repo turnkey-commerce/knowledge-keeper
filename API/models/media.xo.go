@@ -167,7 +167,7 @@ func (m *Media) Delete(db XODB) error {
 // that are paginated by the limit and offset inputs.
 func GetRecentPaginatedMedias(db XODB, limit int, offset int) ([]*Media, error) {
 	const sqlstr = `SELECT ` +
-		`media_id, type, title, description, url, created_by, updated_by, topic_id, date_created ` +
+		`media_id, type, title, description, url, created_by, updated_by, topic_id ` +
 		`FROM public.media ` +
 		`ORDER BY date_created DESC ` +
 		`LIMIT $1 OFFSET $2`

@@ -2,8 +2,6 @@ package handlers
 
 import (
 	"database/sql"
-
-	_ "github.com/lib/pq"
 )
 
 // Handler carries the DB reference
