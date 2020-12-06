@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="0,90" last-zoom="1"
+<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="0,0" last-zoom="1"
 	 default-schema="public">
 <database name="knowledge-keeper" is-template="false" allow-conns="true">
 </database>
@@ -21,7 +21,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		<type name="varchar" length="50"/>
 	</column>
 	<column name="description">
-		<type name="varchar" length="500"/>
+		<type name="varchar" length="1000"/>
 	</column>
 	<column name="created_by" not-null="true">
 		<type name="bigint" length="0"/>
@@ -201,7 +201,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		<type name="varchar" length="50"/>
 	</column>
 	<column name="description">
-		<type name="varchar" length="500"/>
+		<type name="varchar" length="1000"/>
 	</column>
 	<column name="url" not-null="true">
 		<type name="varchar" length="255"/>
@@ -241,7 +241,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		<type name="varchar" length="50"/>
 	</column>
 	<column name="description">
-		<type name="varchar" length="500"/>
+		<type name="varchar" length="1000"/>
 	</column>
 	<column name="created_by" not-null="true">
 		<type name="bigint" length="0"/>

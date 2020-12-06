@@ -21,7 +21,7 @@ SET check_function_bodies = false;
 CREATE TABLE public.categories(
 	category_id bigserial NOT NULL,
 	name varchar(50) NOT NULL,
-	description varchar(500),
+	description varchar(1000),
 	created_by bigint NOT NULL,
 	updated_by bigint,
 	date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -120,7 +120,7 @@ CREATE TABLE public.media(
 	media_id bigserial NOT NULL,
 	type public.media_type NOT NULL,
 	title varchar(50) NOT NULL,
-	description varchar(500),
+	description varchar(1000),
 	url varchar(255) NOT NULL,
 	created_by bigint NOT NULL,
 	updated_by bigint,
@@ -137,7 +137,7 @@ CREATE TABLE public.media(
 CREATE TABLE public.notes(
 	note_id bigserial NOT NULL,
 	title varchar(50) NOT NULL,
-	description varchar(500),
+	description varchar(1000),
 	created_by bigint NOT NULL,
 	updated_by bigint,
 	date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

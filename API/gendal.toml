@@ -36,6 +36,28 @@ IgnoreFields = ["date_created", "date_updated"]
 # TemplatePath sets the path for user-defined templates.
 TemplatePath = "templates"
 
+# TypeOverrides specifies how to handle null types
+[[TypeOverrides]]
+DatabaseType = "bigint"
+Type_ = "int64"
+NilValue = "0"
+NullableType = "nullable.Int"
+NullableNilValue = "nil"
+
+[[TypeOverrides]]
+DatabaseType = "character varying(1000)"
+Type_ = "string"
+NilValue = '""'
+NullableType = "nullable.String"
+NullableNilValue = "nil"
+
+[[TypeOverrides]]
+DatabaseType = "text"
+Type_ = "string"
+NilValue = '""'
+NullableType = "nullable.String"
+NullableNilValue = "nil"
+
 # Suffix is the file suffix for the generated files.
 Suffix = ".xo.go"
 
