@@ -5,17 +5,19 @@ package models
 
 import (
 	"database/sql"
+
+	nullable "gopkg.in/guregu/null.v4"
 )
 
 // TagTopicsView represents a row from 'public.tag_topics_view'.
 type TagTopicsView struct {
-	TagID       sql.NullInt64  `json:"tag_id"`      // tag_id
-	TopicID     sql.NullInt64  `json:"topic_id"`    // topic_id
-	CategoryID  sql.NullInt64  `json:"category_id"` // category_id
-	Title       sql.NullString `json:"title"`       // title
-	Description sql.NullString `json:"description"` // description
-	CreatedBy   sql.NullInt64  `json:"created_by"`  // created_by
-	UpdatedBy   sql.NullInt64  `json:"updated_by"`  // updated_by
+	TagID       nullable.Int    `json:"tag_id"`      // tag_id
+	TopicID     nullable.Int    `json:"topic_id"`    // topic_id
+	CategoryID  nullable.Int    `json:"category_id"` // category_id
+	Title       sql.NullString  `json:"title"`       // title
+	Description nullable.String `json:"description"` // description
+	CreatedBy   nullable.Int    `json:"created_by"`  // created_by
+	UpdatedBy   nullable.Int    `json:"updated_by"`  // updated_by
 }
 
 // GetRecentPaginatedTagTopicsViews returns rows from 'public.tag_topics_view',

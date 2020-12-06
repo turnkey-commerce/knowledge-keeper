@@ -10,6 +10,7 @@ import (
 	"github.com/turnkey-commerce/knowledge-keeper/models"
 	"github.com/turnkey-commerce/knowledge-keeper/models/queries"
 	"github.com/xo/dburl"
+	nullable "gopkg.in/guregu/null.v4"
 )
 
 func init() {
@@ -169,7 +170,7 @@ func createUserAndCategory(db *sql.DB, userEmail string, categoryName string) (i
 
 	category := models.Category{
 		Name:        categoryName,
-		Description: sql.NullString{String: "Special Description"},
+		Description: nullable.StringFrom("Special Description"),
 		CreatedBy:   user.UserID,
 	}
 
@@ -183,14 +184,14 @@ func createTopics(db *sql.DB, topicTitle1 string, topicTitle2 string,
 	categoryID int64, userID int64) (int64, int64) {
 	topic1 := models.Topic{
 		Title:       topicTitle1,
-		Description: sql.NullString{String: "Topic1 Description"},
+		Description: nullable.StringFrom("Topic1 Description"),
 		CategoryID:  categoryID,
 		CreatedBy:   userID,
 	}
 
 	topic2 := models.Topic{
 		Title:       topicTitle2,
-		Description: sql.NullString{String: "Topic2 Description"},
+		Description: nullable.StringFrom("Topic2 Description"),
 		CategoryID:  categoryID,
 		CreatedBy:   userID,
 	}

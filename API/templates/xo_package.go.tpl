@@ -13,5 +13,6 @@ import (
 	"strings"
 	"time"
 	"github.com/jackc/pgtype"
+	nullable "gopkg.in/guregu/null.v4"
 )
 

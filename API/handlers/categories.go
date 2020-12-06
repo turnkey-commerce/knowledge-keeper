@@ -1,12 +1,12 @@
 package handlers
 
 import (
-	"database/sql"
 	"net/http"
 	"strconv"
 
 	echo "github.com/labstack/echo/v4"
 	"github.com/turnkey-commerce/knowledge-keeper/models"
+	nullable "gopkg.in/guregu/null.v4"
 )
 
 // GetRecentCategoriesPaginated returns the recently added categories by limit/offset.
@@ -47,29 +47,33 @@ func (h *Handler) SaveCategory(c echo.Context) error {
 	// TODO: get userId from token
 	userID := 4
 	cat.CreatedBy = int64(userID)
-	cat.UpdatedBy = sql.NullInt64{}
+	cat.UpdatedBy = nullable.Int{}
 
 	err := cat.Save(h.DB)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Can't save category "+err.Error())
 	}
 
-	return c.JSON(http.StatusCreated, c)
+	return c.JSON(http.StatusCreated, cat)
 }
 
 // UpdateCategory updates the category in the database.
 func (h *Handler) UpdateCategory(c echo.Context) error {
-	cat := &models.Category{}
+	id, _ := strconv.Atoi(c.Param("id"))
+	cat, err := models.CategoryByCategoryID(h.DB, int64(id))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Can't process input category")
+	}
+
 	if err := c.Bind(cat); err != nil {
 		return err
 	}
-	id, _ := strconv.Atoi(c.Param("id"))
-	cat.CategoryID = int64(id)
+
 	// TODO: get userId from token
 	userID := 4
-	cat.UpdatedBy = sql.NullInt64{Int64: int64(userID)}
+	cat.UpdatedBy = nullable.IntFrom(int64(userID))
 
-	err := cat.Upsert(h.DB)
+	err = cat.Update(h.DB)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Can't save category "+err.Error())
 	}

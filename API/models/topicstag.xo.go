@@ -119,20 +119,6 @@ func GetRecentPaginatedTopicsTags(db XODB, limit int, offset int) ([]*TopicsTag,
 	return res, nil
 }
 
-// Tag returns the Tag associated with the TopicsTag's TagID (tag_id).
-//
-// Generated from foreign key 'tags_fk'.
-func (tt *TopicsTag) Tag(db XODB) (*Tag, error) {
-	return TagByTagID(db, tt.TagID)
-}
-
-// Topic returns the Topic associated with the TopicsTag's TopicID (topic_id).
-//
-// Generated from foreign key 'topics_fk'.
-func (tt *TopicsTag) Topic(db XODB) (*Topic, error) {
-	return TopicByTopicID(db, tt.TopicID)
-}
-
 // TopicsTagByTopicIDTagID retrieves a row from 'public.topics_tags' as a TopicsTag.
 //
 // Generated from index 'topics_tags_pk'.

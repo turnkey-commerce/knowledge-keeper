@@ -119,20 +119,6 @@ func GetRecentPaginatedRelatedTopics(db XODB, limit int, offset int) ([]*Related
 	return res, nil
 }
 
-// TopicByRelatedTopicID returns the Topic associated with the RelatedTopic's RelatedTopicID (related_topic_id).
-//
-// Generated from foreign key 'related_topic_fk'.
-func (rt *RelatedTopic) TopicByRelatedTopicID(db XODB) (*Topic, error) {
-	return TopicByTopicID(db, rt.RelatedTopicID)
-}
-
-// TopicByTopicID returns the Topic associated with the RelatedTopic's TopicID (topic_id).
-//
-// Generated from foreign key 'topic_fk'.
-func (rt *RelatedTopic) TopicByTopicID(db XODB) (*Topic, error) {
-	return TopicByTopicID(db, rt.TopicID)
-}
-
 // RelatedTopicByTopicIDRelatedTopicID retrieves a row from 'public.related_topics' as a RelatedTopic.
 //
 // Generated from index 'related_topics_pk'.

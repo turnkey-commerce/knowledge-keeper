@@ -55,15 +55,19 @@ func (h *Handler) SaveUser(c echo.Context) error {
 
 // UpdateUser updates the user in the database.
 func (h *Handler) UpdateUser(c echo.Context) error {
-	u := &models.User{}
+	id, _ := strconv.Atoi(c.Param("id"))
+	u, err := models.UserByUserID(h.DB, int64(id))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Can't process input user")
+	}
+
 	if err := c.Bind(u); err != nil {
 		return err
 	}
-	id, _ := strconv.Atoi(c.Param("id"))
-	u.Email = strings.ToLower(u.Email)
-	u.UserID = int64(id)
 
-	err := u.Upsert(h.DB)
+	u.Email = strings.ToLower(u.Email)
+
+	err = u.Update(h.DB)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Can't save user "+err.Error())
 	}

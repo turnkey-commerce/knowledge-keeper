@@ -5,17 +5,19 @@ package models
 
 import (
 	"database/sql"
+
+	nullable "gopkg.in/guregu/null.v4"
 )
 
 // RelatedTopicsView represents a row from 'public.related_topics_view'.
 type RelatedTopicsView struct {
-	TopicID        sql.NullInt64  `json:"topic_id"`         // topic_id
-	RelatedTopicID sql.NullInt64  `json:"related_topic_id"` // related_topic_id
-	CategoryID     sql.NullInt64  `json:"category_id"`      // category_id
-	Title          sql.NullString `json:"title"`            // title
-	Description    sql.NullString `json:"description"`      // description
-	CreatedBy      sql.NullInt64  `json:"created_by"`       // created_by
-	UpdatedBy      sql.NullInt64  `json:"updated_by"`       // updated_by
+	TopicID        nullable.Int    `json:"topic_id"`         // topic_id
+	RelatedTopicID nullable.Int    `json:"related_topic_id"` // related_topic_id
+	CategoryID     nullable.Int    `json:"category_id"`      // category_id
+	Title          sql.NullString  `json:"title"`            // title
+	Description    nullable.String `json:"description"`      // description
+	CreatedBy      nullable.Int    `json:"created_by"`       // created_by
+	UpdatedBy      nullable.Int    `json:"updated_by"`       // updated_by
 }
 
 // GetRecentPaginatedRelatedTopicsViews returns rows from 'public.related_topics_view',
