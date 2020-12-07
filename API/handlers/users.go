@@ -11,12 +11,7 @@ import (
 
 // GetRecentUsersPaginated returns the recently added users by limit/offset.
 func (h *Handler) GetRecentUsersPaginated(c echo.Context) error {
-	limit, _ := strconv.Atoi(c.QueryParam("limit"))
-	offset, _ := strconv.Atoi(c.QueryParam("offset"))
-	// In case no limit is passed default to 50.
-	if limit == 0 {
-		limit = 50
-	}
+	limit, offset := getLimitAndOffset(c)
 
 	users, err := models.GetRecentPaginatedUsers(h.DB, limit, offset)
 	if err != nil {

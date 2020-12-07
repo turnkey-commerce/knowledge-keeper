@@ -11,12 +11,7 @@ import (
 
 // GetRecentCategoriesPaginated returns the recently added categories by limit/offset.
 func (h *Handler) GetRecentCategoriesPaginated(c echo.Context) error {
-	limit, _ := strconv.Atoi(c.QueryParam("limit"))
-	offset, _ := strconv.Atoi(c.QueryParam("offset"))
-	// In case no limit is passed default to 50.
-	if limit == 0 {
-		limit = 50
-	}
+	limit, offset := getLimitAndOffset(c)
 
 	categories, err := models.GetRecentPaginatedCategorys(h.DB, limit, offset)
 	if err != nil {
