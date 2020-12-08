@@ -18,8 +18,16 @@ func (h *Handler) GetRoutes(e *echo.Echo) {
 	e.PUT("/categories/:id", h.UpdateCategory)
 	// Topics
 	e.GET("/topics", h.GetRecentTopicsPaginated)
-	e.GET("/topics/name/:title", h.GetTopicByTitle)
+	e.GET("/topics/:id/tags", h.GetTopicTags)
+	e.GET("/topics/title/:title", h.GetTopicByTitle)
 	e.POST("/topics", h.SaveTopic)
 	e.PUT("/topics/:id", h.UpdateTopic)
+	e.POST("/topics/tag", h.AddTagToTopic)
+	// Tags
+	e.GET("/tags", h.GetRecentTagsPaginated)
+	e.GET("/tags/:id/topics", h.GetTagTopics)
+	e.GET("/tags/name/:name", h.GetTagByName)
+	e.POST("/tags", h.SaveTag)
+	e.PUT("/tags/:id", h.UpdateTag)
 
 }
