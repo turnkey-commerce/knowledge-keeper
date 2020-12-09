@@ -18,7 +18,7 @@ type Media struct {
 	URL         string          `json:"url"`         // url
 	CreatedBy   int64           `json:"created_by"`  // created_by
 	UpdatedBy   nullable.Int    `json:"updated_by"`  // updated_by
-	TopicID     nullable.Int    `json:"topic_id"`    // topic_id
+	TopicID     int64           `json:"topic_id"`    // topic_id
 
 	// xo fields
 	_exists, _deleted bool

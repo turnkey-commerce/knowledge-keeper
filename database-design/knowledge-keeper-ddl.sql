@@ -126,7 +126,7 @@ CREATE TABLE public.media(
 	updated_by bigint,
 	date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	date_updated timestamp,
-	topic_id bigint,
+	topic_id bigint NOT NULL,
 	CONSTRAINT media_pk PRIMARY KEY (media_id)
 
 );
@@ -142,7 +142,7 @@ CREATE TABLE public.notes(
 	updated_by bigint,
 	date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	date_updated timestamp,
-	topic_id bigint,
+	topic_id bigint NOT NULL,
 	CONSTRAINT notes_pk PRIMARY KEY (note_id)
 
 );

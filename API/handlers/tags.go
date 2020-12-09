@@ -52,7 +52,7 @@ func (h *Handler) SaveTag(c echo.Context) error {
 	}
 
 	// TODO: get userId from token
-	userID := 4
+	userID := 1
 	t.CreatedBy = int64(userID)
 	t.UpdatedBy = nullable.Int{}
 
@@ -77,7 +77,7 @@ func (h *Handler) UpdateTag(c echo.Context) error {
 	}
 
 	// TODO: get userId from token
-	userID := 4
+	userID := 1
 	t.UpdatedBy = nullable.IntFrom(int64(userID))
 
 	err = t.Update(h.DB)

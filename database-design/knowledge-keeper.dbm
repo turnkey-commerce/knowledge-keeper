@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="0,0" last-zoom="1"
+<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="378,540" last-zoom="1"
 	 default-schema="public">
 <database name="knowledge-keeper" is-template="false" allow-conns="true">
 </database>
@@ -283,7 +283,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	 custom-color="#83af1f"
 	 src-table="public.topics"
 	 dst-table="public.notes"
-	 src-required="false" dst-required="false"
+	 src-required="true" dst-required="false"
 	upd-action="CASCADE"
 	del-action="CASCADE">
 	<line>
@@ -301,7 +301,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	 custom-color="#83af1f"
 	 src-table="public.topics"
 	 dst-table="public.media"
-	 src-required="false" dst-required="false"
+	 src-required="true" dst-required="false"
 	upd-action="CASCADE"
 	del-action="CASCADE">
 	<label ref-type="name-label">

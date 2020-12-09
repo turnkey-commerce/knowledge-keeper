@@ -40,7 +40,7 @@ func (h *Handler) SaveCategory(c echo.Context) error {
 	}
 
 	// TODO: get userId from token
-	userID := 4
+	userID := 1
 	cat.CreatedBy = int64(userID)
 	cat.UpdatedBy = nullable.Int{}
 
@@ -65,7 +65,7 @@ func (h *Handler) UpdateCategory(c echo.Context) error {
 	}
 
 	// TODO: get userId from token
-	userID := 4
+	userID := 1
 	cat.UpdatedBy = nullable.IntFrom(int64(userID))
 
 	err = cat.Update(h.DB)
