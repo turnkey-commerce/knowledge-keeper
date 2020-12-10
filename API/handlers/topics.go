@@ -44,6 +44,17 @@ func (h *Handler) GetTopicTags(c echo.Context) error {
 	return c.JSON(http.StatusOK, tags)
 }
 
+// GetTopicNotes returns the notes associated with the topic.
+func (h *Handler) GetTopicNotes(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+	tags, err := queries.NotesByTopicID(h.DB, int64(id))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "Can't find notes")
+	}
+
+	return c.JSON(http.StatusOK, tags)
+}
+
 // SaveTopic saves the topic to the database.
 func (h *Handler) SaveTopic(c echo.Context) error {
 	t := &models.Topic{}

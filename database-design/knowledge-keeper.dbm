@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="378,540" last-zoom="1"
+<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="0,718" last-zoom="1"
 	 default-schema="public">
 <database name="knowledge-keeper" is-template="false" allow-conns="true">
 </database>
@@ -461,6 +461,26 @@ END;]]></definition>
     topics.date_updated
    FROM related_topics
      LEFT JOIN topics ON (related_topics.related_topic_id = topics.topic_id)]]></expression>
+	</reference>
+</view>
+
+<view name="topics_notes_view">
+	<schema name="public"/>
+	<position x="985" y="904"/>
+	<reference>
+		<expression><![CDATA[ SELECT notes.*
+    FROM notes JOIN topics
+      ON topics.topic_id = notes.topic_id]]></expression>
+	</reference>
+</view>
+
+<view name="topics_media_view">
+	<schema name="public"/>
+	<position x="578" y="907"/>
+	<reference>
+		<expression><![CDATA[ SELECT media.*
+    FROM media JOIN topics
+      ON topics.topic_id = media.topic_id]]></expression>
 	</reference>
 </view>
 

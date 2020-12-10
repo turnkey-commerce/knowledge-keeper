@@ -21,6 +21,7 @@ func (h *Handler) GetRoutes(e *echo.Echo) {
 	// Topics
 	e.GET("/topics", h.GetRecentTopicsPaginated)
 	e.GET("/topics/:id/tags", h.GetTopicTags)
+	e.GET("/topics/:id/notes", h.GetTopicNotes)
 	e.GET("/topics/title/:title", h.GetTopicByTitle)
 	e.POST("/topics", h.SaveTopic)
 	e.PUT("/topics/:id", h.UpdateTopic)

@@ -115,3 +115,77 @@ func RelatedTopicsByTopicId(db models.XODB, tagID int64) ([]*models.RelatedTopic
 
 	return res, nil
 }
+
+// NotesByTopicID retrieves all Notes with a given TopicId.
+//
+func NotesByTopicID(db models.XODB, topicID int64) ([]*models.TopicsNotesView, error) {
+	var err error
+
+	// sql query
+	const sqlstr = `SELECT ` +
+		`title, topic_id, note_id, description, created_by, updated_by ` +
+		`FROM public.topics_notes_view ` +
+		`WHERE topic_id = $1` +
+		`ORDER BY title`
+
+	// run query
+	models.XOLog(sqlstr, topicID)
+	q, err := db.Query(sqlstr, topicID)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	res := []*models.TopicsNotesView{}
+	for q.Next() {
+		t := models.TopicsNotesView{}
+
+		// scan
+		err = q.Scan(&t.Title, &t.TopicID, &t.NoteID, &t.Description, &t.CreatedBy, &t.UpdatedBy)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &t)
+	}
+
+	return res, nil
+}
+
+// MediaByTopicID retrieves all Notes with a given TopicId.
+//
+func MediaByTopicID(db models.XODB, topicID int64) ([]*models.TopicsMediaView, error) {
+	var err error
+
+	// sql query
+	const sqlstr = `SELECT ` +
+		`title, topic_id, media_id, type, description, url, created_by, updated_by ` +
+		`FROM public.topics_media_view ` +
+		`WHERE topic_id = $1` +
+		`ORDER BY title`
+
+	// run query
+	models.XOLog(sqlstr, topicID)
+	q, err := db.Query(sqlstr, topicID)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	res := []*models.TopicsMediaView{}
+	for q.Next() {
+		t := models.TopicsMediaView{}
+
+		// scan
+		err = q.Scan(&t.Title, &t.TopicID, &t.MediaID, &t.Type, &t.URL, &t.Description, &t.CreatedBy, &t.UpdatedBy)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &t)
+	}
+
+	return res, nil
+}

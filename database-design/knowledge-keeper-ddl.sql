@@ -344,6 +344,26 @@ SELECT related_topics.topic_id,
      LEFT JOIN topics ON (related_topics.related_topic_id = topics.topic_id);
 -- ddl-end --
 
+-- object: public.topics_notes_view | type: VIEW --
+-- DROP VIEW IF EXISTS public.topics_notes_view CASCADE;
+CREATE VIEW public.topics_notes_view
+AS 
+
+SELECT notes.*
+    FROM notes JOIN topics
+      ON topics.topic_id = notes.topic_id;
+-- ddl-end --
+
+-- object: public.topics_media_view | type: VIEW --
+-- DROP VIEW IF EXISTS public.topics_media_view CASCADE;
+CREATE VIEW public.topics_media_view
+AS 
+
+SELECT media.*
+    FROM media JOIN topics
+      ON topics.topic_id = media.topic_id;
+-- ddl-end --
+
 -- object: categories_created_by_fk | type: CONSTRAINT --
 -- ALTER TABLE public.categories DROP CONSTRAINT IF EXISTS categories_created_by_fk CASCADE;
 ALTER TABLE public.categories ADD CONSTRAINT categories_created_by_fk FOREIGN KEY (created_by)
