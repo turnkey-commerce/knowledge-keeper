@@ -55,6 +55,28 @@ func (h *Handler) GetTopicNotes(c echo.Context) error {
 	return c.JSON(http.StatusOK, tags)
 }
 
+// GetTopicMedia returns the media associated with the topic.
+func (h *Handler) GetTopicMedia(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+	tags, err := queries.MediaByTopicID(h.DB, int64(id))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "Can't find media")
+	}
+
+	return c.JSON(http.StatusOK, tags)
+}
+
+// GetRelatedTopics returns the related topics with the topic.
+func (h *Handler) GetRelatedTopics(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+	topics, err := queries.RelatedTopicsByTopicId(h.DB, int64(id))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "Can't find related topics")
+	}
+
+	return c.JSON(http.StatusOK, topics)
+}
+
 // SaveTopic saves the topic to the database.
 func (h *Handler) SaveTopic(c echo.Context) error {
 	t := &models.Topic{}
@@ -109,6 +131,21 @@ func (h *Handler) AddTagToTopic(c echo.Context) error {
 	err := t.Insert(h.DB)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Can't add topic to tag "+err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, t)
+}
+
+// AddRelatedTopic saves a related topic.
+func (h *Handler) AddRelatedTopic(c echo.Context) error {
+	t := &models.RelatedTopic{}
+	if err := c.Bind(t); err != nil {
+		return err
+	}
+
+	err := t.Insert(h.DB)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Can't add related topic "+err.Error())
 	}
 
 	return c.JSON(http.StatusCreated, t)
