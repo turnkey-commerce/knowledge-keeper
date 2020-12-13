@@ -4,7 +4,9 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	echo "github.com/labstack/echo/v4"
 	"github.com/turnkey-commerce/knowledge-keeper/models"
 )
@@ -30,6 +32,43 @@ func (h *Handler) GetUserByEmail(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, users)
+}
+
+func (h *Handler) UserLogin(c echo.Context) error {
+	u := &models.UserAuth{}
+	if err := c.Bind(u); err != nil {
+		return err
+	}
+	users, err := models.UsersByEmail(h.DB, u.Email)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "Can't find user "+u.Email)
+	}
+	user := users[0]
+	if !validatePassword(user.Hash, u.Password) {
+		return echo.ErrUnauthorized
+	}
+
+	// Create token
+	token := jwt.New(jwt.SigningMethodHS256)
+
+	// Set claims
+	claims := token.Claims.(jwt.MapClaims)
+	claims["user_id"] = user.UserID
+	claims["email"] = user.Email
+	claims["name"] = user.FirstName + " " + user.LastName
+	claims["admin"] = user.IsAdmin
+	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+
+	// Generate encoded token and send it as response.
+	// TODO: Get secret from config.
+	t, err := token.SignedString([]byte("secret"))
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{
+		"token": t,
+	})
 }
 
 // SaveUser saves the user to the database.

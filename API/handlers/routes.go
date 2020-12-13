@@ -2,21 +2,26 @@ package handlers
 
 import (
 	echo "github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 // GetRoutes routes to the handlers
 func (h *Handler) GetRoutes(e *echo.Echo) {
 	// Users
 	e.GET("/users", h.GetRecentUsersPaginated)
+	e.POST("/users/login", h.UserLogin)
 	e.GET("/users/email/:email", h.GetUserByEmail)
 	e.POST("/users", h.SaveUser)
 	e.PUT("/users/:id", h.UpdateUser)
 
 	// Categories
-	e.GET("/categories", h.GetRecentCategoriesPaginated)
-	e.GET("/categories/name/:name", h.GetCategoryByName)
-	e.POST("/categories", h.SaveCategory)
-	e.PUT("/categories/:id", h.UpdateCategory)
+	c := e.Group("/categories")
+	c.Use(middleware.JWT([]byte("secret")))
+
+	c.GET("", h.GetRecentCategoriesPaginated)
+	c.GET("/name/:name", h.GetCategoryByName)
+	c.POST("", h.SaveCategory)
+	c.PUT("/:id", h.UpdateCategory)
 
 	// Topics
 	e.GET("/topics", h.GetRecentTopicsPaginated)

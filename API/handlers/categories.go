@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/dgrijalva/jwt-go"
 	echo "github.com/labstack/echo/v4"
 	"github.com/turnkey-commerce/knowledge-keeper/models"
 	nullable "gopkg.in/guregu/null.v4"
@@ -39,9 +40,10 @@ func (h *Handler) SaveCategory(c echo.Context) error {
 		return err
 	}
 
-	// TODO: get userId from token
-	userID := 1
-	cat.CreatedBy = int64(userID)
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userID := claims["user_id"]
+	cat.CreatedBy = int64(userID.(int64))
 	cat.UpdatedBy = nullable.Int{}
 
 	err := cat.Save(h.DB)
