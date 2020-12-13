@@ -11,8 +11,10 @@ import (
 type User struct {
 	UserID    int64  `json:"user_id"`    // user_id
 	Email     string `json:"email"`      // email
+	Hash      string `json:"hash"`       // hash
 	FirstName string `json:"first_name"` // first_name
 	LastName  string `json:"last_name"`  // last_name
+	IsAdmin   bool   `json:"is_admin"`   // is_admin
 
 	// xo fields
 	_exists, _deleted bool
@@ -39,14 +41,14 @@ func (u *User) Insert(db XODB) error {
 
 	// sql insert query, primary key provided by sequence
 	const sqlstr = `INSERT INTO public.users (` +
-		`email, first_name, last_name` +
+		`email, hash, first_name, last_name, is_admin` +
 		`) VALUES (` +
-		`$1, $2, $3` +
+		`$1, $2, $3, $4, $5` +
 		`) RETURNING user_id`
 
 	// run query
-	XOLog(sqlstr, u.Email, u.FirstName, u.LastName)
-	err = db.QueryRow(sqlstr, u.Email, u.FirstName, u.LastName).Scan(&u.UserID)
+	XOLog(sqlstr, u.Email, u.Hash, u.FirstName, u.LastName, u.IsAdmin)
+	err = db.QueryRow(sqlstr, u.Email, u.Hash, u.FirstName, u.LastName, u.IsAdmin).Scan(&u.UserID)
 	if err != nil {
 		return err
 	}
@@ -73,14 +75,14 @@ func (u *User) Update(db XODB) error {
 
 	// sql query
 	const sqlstr = `UPDATE public.users SET (` +
-		`email, first_name, last_name` +
+		`email, hash, first_name, last_name, is_admin` +
 		`) = ( ` +
-		`$1, $2, $3` +
-		`) WHERE user_id = $4`
+		`$1, $2, $3, $4, $5` +
+		`) WHERE user_id = $6`
 
 	// run query
-	XOLog(sqlstr, u.Email, u.FirstName, u.LastName, u.UserID)
-	_, err = db.Exec(sqlstr, u.Email, u.FirstName, u.LastName, u.UserID)
+	XOLog(sqlstr, u.Email, u.Hash, u.FirstName, u.LastName, u.IsAdmin, u.UserID)
+	_, err = db.Exec(sqlstr, u.Email, u.Hash, u.FirstName, u.LastName, u.IsAdmin, u.UserID)
 	return err
 }
 
@@ -106,18 +108,18 @@ func (u *User) Upsert(db XODB) error {
 
 	// sql query
 	const sqlstr = `INSERT INTO public.users (` +
-		`user_id, email, first_name, last_name` +
+		`user_id, email, hash, first_name, last_name, is_admin` +
 		`) VALUES (` +
-		`$1, $2, $3, $4` +
+		`$1, $2, $3, $4, $5, $6` +
 		`) ON CONFLICT (user_id) DO UPDATE SET (` +
-		`user_id, email, first_name, last_name` +
+		`user_id, email, hash, first_name, last_name, is_admin` +
 		`) = (` +
-		`EXCLUDED.user_id, EXCLUDED.email, EXCLUDED.first_name, EXCLUDED.last_name` +
+		`EXCLUDED.user_id, EXCLUDED.email, EXCLUDED.hash, EXCLUDED.first_name, EXCLUDED.last_name, EXCLUDED.is_admin` +
 		`)`
 
 	// run query
-	XOLog(sqlstr, u.UserID, u.Email, u.FirstName, u.LastName)
-	_, err = db.Exec(sqlstr, u.UserID, u.Email, u.FirstName, u.LastName)
+	XOLog(sqlstr, u.UserID, u.Email, u.Hash, u.FirstName, u.LastName, u.IsAdmin)
+	_, err = db.Exec(sqlstr, u.UserID, u.Email, u.Hash, u.FirstName, u.LastName, u.IsAdmin)
 	if err != nil {
 		return err
 	}
@@ -162,7 +164,7 @@ func (u *User) Delete(db XODB) error {
 // that are paginated by the limit and offset inputs.
 func GetRecentPaginatedUsers(db XODB, limit int, offset int) ([]*User, error) {
 	const sqlstr = `SELECT ` +
-		`user_id, email, first_name, last_name ` +
+		`user_id, email, hash, first_name, last_name, is_admin ` +
 		`FROM public.users ` +
 		`ORDER BY date_created DESC ` +
 		`LIMIT $1 OFFSET $2`
@@ -179,7 +181,7 @@ func GetRecentPaginatedUsers(db XODB, limit int, offset int) ([]*User, error) {
 		u := User{}
 
 		// scan
-		err = q.Scan(&u.UserID, &u.Email, &u.FirstName, &u.LastName)
+		err = q.Scan(&u.UserID, &u.Email, &u.Hash, &u.FirstName, &u.LastName, &u.IsAdmin)
 		if err != nil {
 			return nil, err
 		}
@@ -198,7 +200,7 @@ func UsersByEmail(db XODB, email string) ([]*User, error) {
 
 	// sql query
 	const sqlstr = `SELECT ` +
-		`user_id, email, first_name, last_name ` +
+		`user_id, email, hash, first_name, last_name, is_admin ` +
 		`FROM public.users ` +
 		`WHERE email = $1`
 
@@ -218,7 +220,7 @@ func UsersByEmail(db XODB, email string) ([]*User, error) {
 		}
 
 		// scan
-		err = q.Scan(&u.UserID, &u.Email, &u.FirstName, &u.LastName)
+		err = q.Scan(&u.UserID, &u.Email, &u.Hash, &u.FirstName, &u.LastName, &u.IsAdmin)
 		if err != nil {
 			return nil, err
 		}
@@ -237,7 +239,7 @@ func UserByUserID(db XODB, userID int64) (*User, error) {
 
 	// sql query
 	const sqlstr = `SELECT ` +
-		`user_id, email, first_name, last_name ` +
+		`user_id, email, hash, first_name, last_name, is_admin ` +
 		`FROM public.users ` +
 		`WHERE user_id = $1`
 
@@ -247,7 +249,7 @@ func UserByUserID(db XODB, userID int64) (*User, error) {
 		_exists: true,
 	}
 
-	err = db.QueryRow(sqlstr, userID).Scan(&u.UserID, &u.Email, &u.FirstName, &u.LastName)
+	err = db.QueryRow(sqlstr, userID).Scan(&u.UserID, &u.Email, &u.Hash, &u.FirstName, &u.LastName, &u.IsAdmin)
 	if err != nil {
 		return nil, err
 	}

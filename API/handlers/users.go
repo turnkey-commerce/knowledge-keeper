@@ -34,13 +34,19 @@ func (h *Handler) GetUserByEmail(c echo.Context) error {
 
 // SaveUser saves the user to the database.
 func (h *Handler) SaveUser(c echo.Context) error {
-	u := &models.User{}
+	u := &models.UserAuth{}
 	if err := c.Bind(u); err != nil {
 		return err
 	}
 	u.Email = strings.ToLower(u.Email)
-
-	err := u.Save(h.DB)
+	hash, err := hashPassword(u.Password)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Can't process user hash")
+	}
+	u.Hash = hash
+	// Clear password so it's not returned as part of the extended struct.
+	u.Password = ""
+	err = u.Save(h.DB)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Can't save user "+err.Error())
 	}

@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="0,718" last-zoom="1"
+<dbmodel pgmodeler-ver="0.9.1" author="James Culbertson" last-position="0,0" last-zoom="1"
 	 default-schema="public">
 <database name="knowledge-keeper" is-template="false" allow-conns="true">
 </database>
@@ -49,11 +49,17 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<column name="email" not-null="true">
 		<type name="varchar" length="255"/>
 	</column>
+	<column name="hash" not-null="true">
+		<type name="varchar" length="255"/>
+	</column>
 	<column name="first_name" not-null="true">
 		<type name="varchar" length="50"/>
 	</column>
 	<column name="last_name" not-null="true">
 		<type name="varchar" length="50"/>
+	</column>
+	<column name="is_admin" not-null="true" default-value="false">
+		<type name="bool" length="0"/>
 	</column>
 	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP">
 		<type name="timestamp" length="0"/>

@@ -1,6 +1,6 @@
 -- Database generated with pgModeler (PostgreSQL Database Modeler).
 -- pgModeler  version: 0.9.1
--- PostgreSQL version: 9.6
+-- PostgreSQL version: 10.0
 -- Project Site: pgmodeler.io
 -- Model Author: James Culbertson
 
@@ -36,8 +36,10 @@ CREATE TABLE public.categories(
 CREATE TABLE public.users(
 	user_id bigserial NOT NULL,
 	email varchar(255) NOT NULL,
+	hash varchar(255) NOT NULL,
 	first_name varchar(50) NOT NULL,
 	last_name varchar(50) NOT NULL,
+	is_admin bool NOT NULL DEFAULT false,
 	date_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	date_updated timestamp,
 	CONSTRAINT users_pk PRIMARY KEY (user_id)

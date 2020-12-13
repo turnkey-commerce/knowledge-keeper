@@ -163,6 +163,8 @@ func createUserAndCategory(db *sql.DB, userEmail string, categoryName string) (i
 		Email:     userEmail,
 		FirstName: "Jack",
 		LastName:  "Test",
+		IsAdmin:   true,
+		Hash:      "testHash",
 	}
 
 	err := user.Save(db)
