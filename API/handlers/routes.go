@@ -7,16 +7,26 @@ import (
 
 // GetRoutes routes to the handlers
 func (h *Handler) GetRoutes(e *echo.Echo) {
-	// Users
-	e.GET("/users", h.GetRecentUsersPaginated)
-	e.POST("/users/login", h.UserLogin)
-	e.GET("/users/email/:email", h.GetUserByEmail)
-	e.POST("/users", h.SaveUser)
-	e.PUT("/users/:id", h.UpdateUser)
+	// TODO: Get secret from config.
+	secret := "secret"
+
+	// Register
+	e.POST("/register", h.SaveUser)
+
+	// Login
+	e.POST("/login", h.UserLogin)
+
+	// Users Restricted
+	u := e.Group("/users")
+	u.Use(middleware.JWT([]byte(secret)))
+
+	u.PUT("/:id", h.UpdateUser)
+	u.GET("", h.GetRecentUsersPaginated)
+	u.GET("/email/:email", h.GetUserByEmail)
 
 	// Categories
 	c := e.Group("/categories")
-	c.Use(middleware.JWT([]byte("secret")))
+	c.Use(middleware.JWT([]byte(secret)))
 
 	c.GET("", h.GetRecentCategoriesPaginated)
 	c.GET("/name/:name", h.GetCategoryByName)
@@ -24,33 +34,45 @@ func (h *Handler) GetRoutes(e *echo.Echo) {
 	c.PUT("/:id", h.UpdateCategory)
 
 	// Topics
-	e.GET("/topics", h.GetRecentTopicsPaginated)
-	e.GET("/topics/:id/tags", h.GetTopicTags)
-	e.GET("/topics/:id/notes", h.GetTopicNotes)
-	e.GET("/topics/:id/media", h.GetTopicMedia)
-	e.GET("/topics/:id/related", h.GetRelatedTopics)
-	e.GET("/topics/title/:title", h.GetTopicByTitle)
-	e.POST("/topics", h.SaveTopic)
-	e.PUT("/topics/:id", h.UpdateTopic)
-	e.POST("/topics/tag", h.AddTagToTopic)
-	e.POST("/topics/related", h.AddRelatedTopic)
+	t := e.Group("/topics")
+	t.Use(middleware.JWT([]byte(secret)))
+
+	t.GET("", h.GetRecentTopicsPaginated)
+	t.GET("/:id/tags", h.GetTopicTags)
+	t.GET("/:id/notes", h.GetTopicNotes)
+	t.GET("/:id/media", h.GetTopicMedia)
+	t.GET("/:id/related", h.GetRelatedTopics)
+	t.GET("/title/:title", h.GetTopicByTitle)
+	t.POST("", h.SaveTopic)
+	t.PUT("/:id", h.UpdateTopic)
+	t.POST("/tag", h.AddTagToTopic)
+	t.POST("/related", h.AddRelatedTopic)
 
 	// Tags
-	e.GET("/tags", h.GetRecentTagsPaginated)
-	e.GET("/tags/:id/topics", h.GetTagTopics)
-	e.GET("/tags/name/:name", h.GetTagByName)
-	e.POST("/tags", h.SaveTag)
-	e.PUT("/tags/:id", h.UpdateTag)
+	tg := e.Group("/tags")
+	tg.Use(middleware.JWT([]byte(secret)))
+
+	tg.GET("", h.GetRecentTagsPaginated)
+	tg.GET("/:id/topics", h.GetTagTopics)
+	tg.GET("/name/:name", h.GetTagByName)
+	tg.POST("", h.SaveTag)
+	tg.PUT("/:id", h.UpdateTag)
 
 	// Notes
-	e.GET("/notes", h.GetRecentNotesPaginated)
-	e.GET("/notes/title/:title", h.GetNoteByTitle)
-	e.POST("/notes", h.SaveNote)
-	e.PUT("/notes/:id", h.UpdateNote)
+	n := e.Group("/notes")
+	n.Use(middleware.JWT([]byte(secret)))
+
+	n.GET("", h.GetRecentNotesPaginated)
+	n.GET("/title/:title", h.GetNoteByTitle)
+	n.POST("", h.SaveNote)
+	n.PUT("/:id", h.UpdateNote)
 
 	// Media
-	e.GET("/media", h.GetRecentMediaPaginated)
-	e.GET("/media/title/:title", h.GetMediaByTitle)
-	e.POST("/media", h.SaveMedia)
-	e.PUT("/media/:id", h.UpdateMedia)
+	m := e.Group("/media")
+	m.Use(middleware.JWT([]byte(secret)))
+
+	m.GET("", h.GetRecentMediaPaginated)
+	m.GET("/title/:title", h.GetMediaByTitle)
+	m.POST("", h.SaveMedia)
+	m.PUT("/:id", h.UpdateMedia)
 }

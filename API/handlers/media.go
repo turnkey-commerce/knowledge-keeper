@@ -39,12 +39,14 @@ func (h *Handler) SaveMedia(c echo.Context) error {
 		return err
 	}
 
-	// TODO: get userId from token
-	userID := 1
-	m.CreatedBy = int64(userID)
+	userID, err := getUserIDFromClaim(c)
+	if err != nil {
+		return err
+	}
+	m.CreatedBy = userID
 	m.UpdatedBy = nullable.Int{}
 
-	err := m.Save(h.DB)
+	err = m.Save(h.DB)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Can't save media "+err.Error())
 	}
@@ -64,8 +66,10 @@ func (h *Handler) UpdateMedia(c echo.Context) error {
 		return err
 	}
 
-	// TODO: get userId from token
-	userID := 1
+	userID, err := getUserIDFromClaim(c)
+	if err != nil {
+		return err
+	}
 	m.UpdatedBy = nullable.IntFrom(int64(userID))
 
 	err = m.Update(h.DB)

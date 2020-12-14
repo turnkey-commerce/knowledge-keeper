@@ -39,12 +39,14 @@ func (h *Handler) SaveNote(c echo.Context) error {
 		return err
 	}
 
-	// TODO: get userId from token
-	userID := 1
-	n.CreatedBy = int64(userID)
+	userID, err := getUserIDFromClaim(c)
+	if err != nil {
+		return err
+	}
+	n.CreatedBy = userID
 	n.UpdatedBy = nullable.Int{}
 
-	err := n.Save(h.DB)
+	err = n.Save(h.DB)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Can't save note "+err.Error())
 	}
@@ -64,8 +66,10 @@ func (h *Handler) UpdateNote(c echo.Context) error {
 		return err
 	}
 
-	// TODO: get userId from token
-	userID := 1
+	userID, err := getUserIDFromClaim(c)
+	if err != nil {
+		return err
+	}
 	n.UpdatedBy = nullable.IntFrom(int64(userID))
 
 	err = n.Update(h.DB)

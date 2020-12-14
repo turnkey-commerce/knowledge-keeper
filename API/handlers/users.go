@@ -20,6 +20,11 @@ func (h *Handler) GetRecentUsersPaginated(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound, "Can't find recent users: "+err.Error())
 	}
 
+	// Clear the hash from the output.
+	for _, user := range users {
+		user.Hash = ""
+	}
+
 	return c.JSON(http.StatusOK, users)
 }
 
@@ -34,14 +39,15 @@ func (h *Handler) GetUserByEmail(c echo.Context) error {
 	return c.JSON(http.StatusOK, users)
 }
 
+// UserLogin checks the users credentials and returns a JWT token
 func (h *Handler) UserLogin(c echo.Context) error {
 	u := &models.UserAuth{}
 	if err := c.Bind(u); err != nil {
 		return err
 	}
 	users, err := models.UsersByEmail(h.DB, u.Email)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "Can't find user "+u.Email)
+	if err != nil || len(users) < 1 {
+		return echo.ErrUnauthorized
 	}
 	user := users[0]
 	if !validatePassword(user.Hash, u.Password) {
@@ -53,7 +59,7 @@ func (h *Handler) UserLogin(c echo.Context) error {
 
 	// Set claims
 	claims := token.Claims.(jwt.MapClaims)
-	claims["user_id"] = user.UserID
+	claims["user_id"] = strconv.FormatInt(user.UserID, 10)
 	claims["email"] = user.Email
 	claims["name"] = user.FirstName + " " + user.LastName
 	claims["admin"] = user.IsAdmin

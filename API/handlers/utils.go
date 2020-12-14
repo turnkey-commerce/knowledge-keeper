@@ -3,6 +3,7 @@ package handlers
 import (
 	"strconv"
 
+	"github.com/dgrijalva/jwt-go"
 	echo "github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -38,4 +39,16 @@ func validatePassword(hash string, pwd string) bool {
 		return false
 	}
 	return true
+}
+
+// getUserIDFromClaim gets the userID from the JWT token.
+func getUserIDFromClaim(c echo.Context) (int64, error) {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	claimUID := claims["user_id"]
+	userID, err := strconv.ParseInt(claimUID.(string), 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	return userID, nil
 }

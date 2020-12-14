@@ -51,12 +51,14 @@ func (h *Handler) SaveTag(c echo.Context) error {
 		return err
 	}
 
-	// TODO: get userId from token
-	userID := 1
-	t.CreatedBy = int64(userID)
+	userID, err := getUserIDFromClaim(c)
+	if err != nil {
+		return err
+	}
+	t.CreatedBy = userID
 	t.UpdatedBy = nullable.Int{}
 
-	err := t.Save(h.DB)
+	err = t.Save(h.DB)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Can't save tag "+err.Error())
 	}
@@ -76,8 +78,10 @@ func (h *Handler) UpdateTag(c echo.Context) error {
 		return err
 	}
 
-	// TODO: get userId from token
-	userID := 1
+	userID, err := getUserIDFromClaim(c)
+	if err != nil {
+		return err
+	}
 	t.UpdatedBy = nullable.IntFrom(int64(userID))
 
 	err = t.Update(h.DB)
