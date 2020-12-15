@@ -10,8 +10,9 @@ import (
 )
 
 // New creates a new SQL DB
-func New() *sql.DB {
-	db, err := dburl.Open("postgres://knowledge-keeper:knowledge-keeper@localhost/knowledge-keeper?sslmode=disable")
+func New(dbname string, dbserver string, dbuser string, dbpassword string) *sql.DB {
+	connString := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", dbuser, dbpassword, dbserver, dbname)
+	db, err := dburl.Open(connString)
 	if err != nil {
 		fmt.Println("storage err: ", err)
 	}

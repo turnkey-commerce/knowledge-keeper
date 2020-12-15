@@ -66,8 +66,7 @@ func (h *Handler) UserLogin(c echo.Context) error {
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
 	// Generate encoded token and send it as response.
-	// TODO: Get secret from config.
-	t, err := token.SignedString([]byte("secret"))
+	t, err := token.SignedString([]byte(h.Secret))
 	if err != nil {
 		return err
 	}

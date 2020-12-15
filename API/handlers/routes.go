@@ -7,8 +7,6 @@ import (
 
 // GetRoutes routes to the handlers
 func (h *Handler) GetRoutes(e *echo.Echo) {
-	// TODO: Get secret from config.
-	secret := "secret"
 
 	// Register
 	e.POST("/register", h.SaveUser)
@@ -18,7 +16,7 @@ func (h *Handler) GetRoutes(e *echo.Echo) {
 
 	// Users Restricted
 	u := e.Group("/users")
-	u.Use(middleware.JWT([]byte(secret)))
+	u.Use(middleware.JWT([]byte(h.Secret)))
 
 	u.PUT("/:id", h.UpdateUser)
 	u.GET("", h.GetRecentUsersPaginated)
@@ -26,7 +24,7 @@ func (h *Handler) GetRoutes(e *echo.Echo) {
 
 	// Categories
 	c := e.Group("/categories")
-	c.Use(middleware.JWT([]byte(secret)))
+	c.Use(middleware.JWT([]byte(h.Secret)))
 
 	c.GET("", h.GetRecentCategoriesPaginated)
 	c.GET("/name/:name", h.GetCategoryByName)
@@ -35,7 +33,7 @@ func (h *Handler) GetRoutes(e *echo.Echo) {
 
 	// Topics
 	t := e.Group("/topics")
-	t.Use(middleware.JWT([]byte(secret)))
+	t.Use(middleware.JWT([]byte(h.Secret)))
 
 	t.GET("", h.GetRecentTopicsPaginated)
 	t.GET("/:id/tags", h.GetTopicTags)
@@ -50,7 +48,7 @@ func (h *Handler) GetRoutes(e *echo.Echo) {
 
 	// Tags
 	tg := e.Group("/tags")
-	tg.Use(middleware.JWT([]byte(secret)))
+	tg.Use(middleware.JWT([]byte(h.Secret)))
 
 	tg.GET("", h.GetRecentTagsPaginated)
 	tg.GET("/:id/topics", h.GetTagTopics)
@@ -60,7 +58,7 @@ func (h *Handler) GetRoutes(e *echo.Echo) {
 
 	// Notes
 	n := e.Group("/notes")
-	n.Use(middleware.JWT([]byte(secret)))
+	n.Use(middleware.JWT([]byte(h.Secret)))
 
 	n.GET("", h.GetRecentNotesPaginated)
 	n.GET("/title/:title", h.GetNoteByTitle)
@@ -69,7 +67,7 @@ func (h *Handler) GetRoutes(e *echo.Echo) {
 
 	// Media
 	m := e.Group("/media")
-	m.Use(middleware.JWT([]byte(secret)))
+	m.Use(middleware.JWT([]byte(h.Secret)))
 
 	m.GET("", h.GetRecentMediaPaginated)
 	m.GET("/title/:title", h.GetMediaByTitle)

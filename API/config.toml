@@ -1,0 +1,9 @@
+[server]
+  port = 5000
+  secret = "bn+y}E3qr3xv?bT'E!TQ>690oA#Z?X"
+
+[database]
+  server = "localhost"
+  dbuser = "knowledge-keeper"
+  dbpassword = "knowledge-keeper"
+  #dbname = "knowledge-keeper"
