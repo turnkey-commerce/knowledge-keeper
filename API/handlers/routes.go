@@ -27,6 +27,7 @@ func (h *Handler) GetRoutes(e *echo.Echo) {
 	c.Use(middleware.JWT([]byte(h.Secret)))
 
 	c.GET("", h.GetRecentCategoriesPaginated)
+	c.GET("/:id", h.GetCategoryByCategoryID)
 	c.GET("/name/:name", h.GetCategoryByName)
 	c.POST("", h.SaveCategory)
 	c.PUT("/:id", h.UpdateCategory)
@@ -36,6 +37,7 @@ func (h *Handler) GetRoutes(e *echo.Echo) {
 	t.Use(middleware.JWT([]byte(h.Secret)))
 
 	t.GET("", h.GetRecentTopicsPaginated)
+	t.GET("/:id", h.GetTopicByTopicID)
 	t.GET("/:id/tags", h.GetTopicTags)
 	t.GET("/:id/notes", h.GetTopicNotes)
 	t.GET("/:id/media", h.GetTopicMedia)
@@ -51,6 +53,7 @@ func (h *Handler) GetRoutes(e *echo.Echo) {
 	tg.Use(middleware.JWT([]byte(h.Secret)))
 
 	tg.GET("", h.GetRecentTagsPaginated)
+	tg.GET("/:id", h.GetTagByTagID)
 	tg.GET("/:id/topics", h.GetTagTopics)
 	tg.GET("/name/:name", h.GetTagByName)
 	tg.POST("", h.SaveTag)
@@ -61,6 +64,7 @@ func (h *Handler) GetRoutes(e *echo.Echo) {
 	n.Use(middleware.JWT([]byte(h.Secret)))
 
 	n.GET("", h.GetRecentNotesPaginated)
+	n.GET("/:id", h.GetNoteByNoteID)
 	n.GET("/title/:title", h.GetNoteByTitle)
 	n.POST("", h.SaveNote)
 	n.PUT("/:id", h.UpdateNote)
@@ -70,6 +74,7 @@ func (h *Handler) GetRoutes(e *echo.Echo) {
 	m.Use(middleware.JWT([]byte(h.Secret)))
 
 	m.GET("", h.GetRecentMediaPaginated)
+	m.GET("/:id", h.GetMediaByMediaID)
 	m.GET("/title/:title", h.GetMediaByTitle)
 	m.POST("", h.SaveMedia)
 	m.PUT("/:id", h.UpdateMedia)

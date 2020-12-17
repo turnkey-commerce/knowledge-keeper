@@ -21,6 +21,17 @@ func (h *Handler) GetRecentNotesPaginated(c echo.Context) error {
 	return c.JSON(http.StatusOK, notes)
 }
 
+// GetNoteByNoteID returns the note by id.
+func (h *Handler) GetNoteByNoteID(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+	note, err := models.NoteByNoteID(h.DB, int64(id))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Can't get note by ID "+c.Param("id"))
+	}
+
+	return c.JSON(http.StatusOK, note)
+}
+
 // GetNoteByTitle returns the note by name.
 func (h *Handler) GetNoteByTitle(c echo.Context) error {
 	title := c.Param("title")

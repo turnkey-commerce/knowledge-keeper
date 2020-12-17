@@ -22,6 +22,17 @@ func (h *Handler) GetRecentTagsPaginated(c echo.Context) error {
 	return c.JSON(http.StatusOK, tags)
 }
 
+// GetTagByTagID returns the tag by id.
+func (h *Handler) GetTagByTagID(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+	tag, err := models.TagByTagID(h.DB, int64(id))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Can't get tag by ID "+c.Param("id"))
+	}
+
+	return c.JSON(http.StatusOK, tag)
+}
+
 // GetTagTopics returns the topics associated with the tag.
 func (h *Handler) GetTagTopics(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))

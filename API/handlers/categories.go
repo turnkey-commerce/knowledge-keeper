@@ -21,6 +21,17 @@ func (h *Handler) GetRecentCategoriesPaginated(c echo.Context) error {
 	return c.JSON(http.StatusOK, categories)
 }
 
+// GetCategoryByCategoryID returns the category by id.
+func (h *Handler) GetCategoryByCategoryID(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+	category, err := models.CategoryByCategoryID(h.DB, int64(id))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Can't get category by ID "+c.Param("id"))
+	}
+
+	return c.JSON(http.StatusOK, category)
+}
+
 // GetCategoryByName returns the category by name.
 func (h *Handler) GetCategoryByName(c echo.Context) error {
 	name := c.Param("name")

@@ -22,6 +22,17 @@ func (h *Handler) GetRecentTopicsPaginated(c echo.Context) error {
 	return c.JSON(http.StatusOK, topics)
 }
 
+// GetTopicByTopicID returns the topic by id.
+func (h *Handler) GetTopicByTopicID(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+	topic, err := models.TopicByTopicID(h.DB, int64(id))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Can't get topic by ID "+c.Param("id"))
+	}
+
+	return c.JSON(http.StatusOK, topic)
+}
+
 // GetTopicByTitle returns the topic by title.
 func (h *Handler) GetTopicByTitle(c echo.Context) error {
 	title := c.Param("title")

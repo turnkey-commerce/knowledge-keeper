@@ -21,6 +21,17 @@ func (h *Handler) GetRecentMediaPaginated(c echo.Context) error {
 	return c.JSON(http.StatusOK, media)
 }
 
+// GetMediaByMediaID returns the media by id.
+func (h *Handler) GetMediaByMediaID(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+	media, err := models.MediaByMediaID(h.DB, int64(id))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Can't get media by ID "+c.Param("id"))
+	}
+
+	return c.JSON(http.StatusOK, media)
+}
+
 // GetMediaByTitle returns the media by name.
 func (h *Handler) GetMediaByTitle(c echo.Context) error {
 	title := c.Param("title")
