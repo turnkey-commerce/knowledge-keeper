@@ -1,0 +1,78 @@
+basePath: /
+definitions:
+  httputil.HTTPError:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: status bad request
+        type: string
+    type: object
+  models.UserAuth:
+    properties:
+      email:
+        description: email
+        type: string
+      first_name:
+        description: first_name
+        type: string
+      hash:
+        description: hash
+        type: string
+      is_admin:
+        description: is_admin
+        type: boolean
+      last_name:
+        description: last_name
+        type: string
+      password:
+        description: password
+        type: string
+      user_id:
+        description: user_id
+        type: integer
+    type: object
+host: localhost:5000
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server Petstore server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Logs in the users
+      parameters:
+      - description: Login
+        in: body
+        name: userAuth
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserAuth'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserAuth'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Bad Input
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: User Login
+swagger: "2.0"

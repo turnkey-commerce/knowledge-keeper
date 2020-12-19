@@ -6,6 +6,9 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 	"github.com/spf13/viper"
+	"github.com/swaggo/echo-swagger"
+
+	_ "github.com/turnkey-commerce/knowledge-keeper/docs"
 
 	"github.com/turnkey-commerce/knowledge-keeper/config"
 	"github.com/turnkey-commerce/knowledge-keeper/database"
@@ -13,6 +16,20 @@ import (
 	"github.com/turnkey-commerce/knowledge-keeper/middlewares"
 )
 
+// @title Swagger Example API
+// @version 1.0
+// @description This is a sample server Petstore server.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:5000
+// @BasePath /
 func main() {
 	// Set the file name of the configurations file
 	viper.SetConfigName("config")
@@ -36,6 +53,7 @@ func main() {
 	}
 
 	e := echo.New()
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	db := database.New(conf.Database.DBName, conf.Database.Server, conf.Database.DBUser, conf.Database.DBPassword)
 	fmt.Println(db.Stats().InUse)

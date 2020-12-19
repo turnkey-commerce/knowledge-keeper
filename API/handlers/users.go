@@ -39,7 +39,16 @@ func (h *Handler) GetUserByEmail(c echo.Context) error {
 	return c.JSON(http.StatusOK, users)
 }
 
-// UserLogin checks the users credentials and returns a JWT token
+// UserLogin godoc
+// @Summary User Login
+// @Description Logs in the users
+// @Accept  json
+// @Produce  json
+// @Param userAuth body models.UserAuth true "Login"
+// @Success 200 {object} models.UserAuth
+// @Failure 401 {object} httputil.HTTPError "Unauthorized"
+// @Failure 500 {object} httputil.HTTPError "Bad Input"
+// @Router /login [post]
 func (h *Handler) UserLogin(c echo.Context) error {
 	u := &models.UserAuth{}
 	if err := c.Bind(u); err != nil {
