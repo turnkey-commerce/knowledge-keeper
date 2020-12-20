@@ -187,6 +187,10 @@ func (h *Handler) UpdateUser(c echo.Context) error {
 
 	isAdmin := httputil.IsAdmin(c)
 	isExistingUser := httputil.IsUserEditingSelf(c, existingUser.Email)
+	// Only admins or the same user can edit a user.
+	if !isAdmin && !isExistingUser {
+		return echo.ErrUnauthorized
+	}
 
 	u := &models.UserUpdate{}
 	if err := c.Bind(u); err != nil {
@@ -198,17 +202,14 @@ func (h *Handler) UpdateUser(c echo.Context) error {
 		existingUser.IsAdmin = u.IsAdmin
 	}
 
-	if isAdmin || isExistingUser {
-		// Only admins or the same user can edit.
-		hash, err := hashPassword(u.Password)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, "Can't process user hash")
-		}
-		existingUser.Hash = hash
-		existingUser.Email = strings.ToLower(u.Email)
-		existingUser.FirstName = u.FirstName
-		existingUser.LastName = u.LastName
+	hash, err := hashPassword(u.Password)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Can't process user hash")
 	}
+	existingUser.Hash = hash
+	existingUser.Email = strings.ToLower(u.Email)
+	existingUser.FirstName = u.FirstName
+	existingUser.LastName = u.LastName
 
 	err = existingUser.Update(h.DB)
 	if err != nil {
