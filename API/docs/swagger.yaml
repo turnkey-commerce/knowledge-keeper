@@ -9,7 +9,22 @@ definitions:
         example: status bad request
         type: string
     type: object
-  models.UserAuth:
+  models.Token:
+    properties:
+      token:
+        description: password
+        type: string
+    type: object
+  models.UserLogin:
+    properties:
+      email:
+        description: password
+        type: string
+      password:
+        description: password
+        type: string
+    type: object
+  models.UserRegistration:
     properties:
       email:
         description: email
@@ -33,39 +48,57 @@ definitions:
         description: user_id
         type: integer
     type: object
+  models.UserUpdate:
+    properties:
+      email:
+        description: password
+        type: string
+      first_name:
+        description: first_name
+        type: string
+      is_admin:
+        description: is_admin
+        type: boolean
+      last_name:
+        description: last_name
+        type: string
+      password:
+        description: password
+        type: string
+    type: object
 host: localhost:5000
 info:
   contact:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: This is a sample server Petstore server.
+  description: API docs for the Knowledge Keeper application.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: Swagger Example API
+  title: Knowledge Keeper API
   version: "1.0"
 paths:
   /login:
     post:
       consumes:
       - application/json
-      description: Logs in the users
+      description: Logs in the user
       parameters:
       - description: Login
         in: body
-        name: userAuth
+        name: userLogin
         required: true
         schema:
-          $ref: '#/definitions/models.UserAuth'
+          $ref: '#/definitions/models.UserLogin'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.UserAuth'
+            $ref: '#/definitions/models.Token'
         "401":
           description: Unauthorized
           schema:
@@ -75,4 +108,175 @@ paths:
           schema:
             $ref: '#/definitions/httputil.HTTPError'
       summary: User Login
+      tags:
+      - login
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Creates new user for registration
+      parameters:
+      - description: Register
+        in: body
+        name: UserRegistration
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserRegistration'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.UserRegistration'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Bad Input
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Create new user
+      tags:
+      - register
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Gets Recent Users with optional Pagination
+      parameters:
+      - default: 50
+        description: Limit returned per page
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset from start row
+        in: query
+        name: offset
+        type: integer
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.UserRegistration'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Usrs Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Recent Users Paginated
+      tags:
+      - users
+  /users/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Updates a user
+      parameters:
+      - description: id of user
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update
+        in: body
+        name: UserUpdate
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserUpdate'
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.UserRegistration'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Bad Input
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: Updates a user
+      tags:
+      - users
+  /users/email/{email}:
+    get:
+      consumes:
+      - application/json
+      description: Gets user by their email address
+      parameters:
+      - description: email address of user
+        in: path
+        name: email
+        required: true
+        type: string
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.UserRegistration'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: User Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user by email
+      tags:
+      - users
 swagger: "2.0"

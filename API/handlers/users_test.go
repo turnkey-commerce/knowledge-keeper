@@ -34,8 +34,8 @@ func init() {
 	txdb.Register("knowledge", "postgres", u.DSN)
 }
 
-// TestCreateUser tests the route to create a new user.
-func TestCreateUser(t *testing.T) {
+// TestRegisterUser tests the route to create a new user.
+func TestRegisterUser(t *testing.T) {
 	// Setup
 	db, err := sql.Open("knowledge", "identifier")
 	defer db.Close()
@@ -49,7 +49,7 @@ func TestCreateUser(t *testing.T) {
 	h := NewHandler(db, "secret")
 
 	// Assertions
-	if assert.NoError(t, h.SaveUser(c)) {
+	if assert.NoError(t, h.UserRegistration(c)) {
 		assert.Equal(t, http.StatusCreated, rec.Code)
 
 		result := make(map[string]interface{})

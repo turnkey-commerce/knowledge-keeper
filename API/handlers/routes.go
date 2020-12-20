@@ -9,7 +9,7 @@ import (
 func (h *Handler) GetRoutes(e *echo.Echo) {
 
 	// Register
-	e.POST("/register", h.SaveUser)
+	e.POST("/register", h.UserRegistration)
 
 	// Login
 	e.POST("/login", h.UserLogin)

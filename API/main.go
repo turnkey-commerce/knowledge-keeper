@@ -16,9 +16,9 @@ import (
 	"github.com/turnkey-commerce/knowledge-keeper/middlewares"
 )
 
-// @title Swagger Example API
+// @title Knowledge Keeper API
 // @version 1.0
-// @description This is a sample server Petstore server.
+// @description API docs for the Knowledge Keeper application.
 // @termsOfService http://swagger.io/terms/
 
 // @contact.name API Support
