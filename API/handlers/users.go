@@ -9,6 +9,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	echo "github.com/labstack/echo/v4"
+	"github.com/turnkey-commerce/knowledge-keeper/httputil"
 	"github.com/turnkey-commerce/knowledge-keeper/models"
 )
 
@@ -147,6 +148,9 @@ func (h *Handler) UserRegistration(c echo.Context) error {
 	}
 	u.Hash = hash
 
+	// Registering users aren't admins.
+	u.IsAdmin = false
+
 	err = u.Save(h.DB)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Can't save user "+err.Error())
@@ -181,22 +185,30 @@ func (h *Handler) UpdateUser(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Can't process input user")
 	}
 
+	isAdmin := httputil.IsAdmin(c)
+	isExistingUser := httputil.IsUserEditingSelf(c, existingUser.Email)
+
 	u := &models.UserUpdate{}
 	if err := c.Bind(u); err != nil {
 		return err
 	}
 
-	existingUser.Email = strings.ToLower(u.Email)
-	existingUser.FirstName = u.FirstName
-	existingUser.LastName = u.LastName
-	existingUser.Email = u.Email
-	existingUser.IsAdmin = u.IsAdmin
-
-	hash, err := hashPassword(u.Password)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "Can't process user hash")
+	if isAdmin {
+		// Only Admin's can change this property
+		existingUser.IsAdmin = u.IsAdmin
 	}
-	existingUser.Hash = hash
+
+	if isAdmin || isExistingUser {
+		// Only admins or the same user can edit.
+		hash, err := hashPassword(u.Password)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, "Can't process user hash")
+		}
+		existingUser.Hash = hash
+		existingUser.Email = strings.ToLower(u.Email)
+		existingUser.FirstName = u.FirstName
+		existingUser.LastName = u.LastName
+	}
 
 	err = existingUser.Update(h.DB)
 	if err != nil {
