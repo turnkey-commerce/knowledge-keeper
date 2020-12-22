@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	txdb "github.com/DATA-DOG/go-txdb"
+	"github.com/dgrijalva/jwt-go"
 	echo "github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
@@ -19,20 +20,27 @@ import (
 )
 
 var (
-	email1 = "juke@email.com"
-	email2 = "jack@email.com"
+	email1       = "juke@email.com"
+	email1Update = "juke2@email.com"
+	email2       = "jack@email.com"
 
 	user1JSON = fmt.Sprintf(`{"email": "%s", 
     "first_name": "Juke",
     "last_name": "Smith",
     "password": "Test-Password",
-	"is_admin": true}`, email1)
+	"is_admin": false}`, email1)
+
+	user1UpdateJSON = fmt.Sprintf(`{"email": "%s", 
+    "first_name": "Jukie",
+    "last_name": "Smithy",
+    "password": "Test-Password",
+	"is_admin": true}`, email1Update)
 
 	user2JSON = fmt.Sprintf(`{"email": "%s", 
     "first_name": "Jack",
     "last_name": "Smith",
     "password": "Test-Password",
-	"is_admin": true}`, email2)
+	"is_admin": false}`, email2)
 
 	user1LoginJSON = fmt.Sprintf(`{"email": "%s", 
 	"password": "Test-Password"}`, email1)
@@ -62,7 +70,7 @@ func TestRegisterUserAndCantCreateDuplicate(t *testing.T) {
 	h := NewHandler(db, "secret")
 
 	// Register the user and make assertions
-	if assert.NoError(t, registerUser1(db, e, rec, h)) {
+	if assert.NoError(t, registerUser(db, e, rec, h, user1JSON)) {
 		assert.Equal(t, http.StatusCreated, rec.Code)
 
 		result := make(map[string]interface{})
@@ -73,7 +81,7 @@ func TestRegisterUserAndCantCreateDuplicate(t *testing.T) {
 	}
 
 	// Assert that there is an error on trying to create the same user again.
-	assert.Error(t, registerUser1(db, e, rec, h))
+	assert.Error(t, registerUser(db, e, rec, h, user1JSON))
 }
 
 // TestRegisteredUserCanLogin tests that the registered user can login.
@@ -89,7 +97,7 @@ func TestRegisteredUserCanLogin(t *testing.T) {
 	h := NewHandler(db, "secret")
 
 	// First register the user.
-	assert.NoError(t, registerUser1(db, e, rec, h))
+	assert.NoError(t, registerUser(db, e, rec, h, user1JSON))
 
 	// Login Success
 	assert.NoError(t, loginUser1(db, e, rec, h, user1LoginJSON))
@@ -98,8 +106,8 @@ func TestRegisteredUserCanLogin(t *testing.T) {
 	assert.Error(t, loginUser1(db, e, rec, h, user1BadLoginJSON))
 }
 
-// TestRegisteredAdminCanViewUsers tests that the registered admin can view recent users.
-func TestRegisteredAdminCanViewUsers(t *testing.T) {
+// TestCanViewRecentUsers tests that the registered user can view recent users.
+func TestCanViewRecentUsers(t *testing.T) {
 	// Setup
 	db, err := sql.Open("knowledge", "identifier")
 	defer db.Close()
@@ -110,7 +118,7 @@ func TestRegisteredAdminCanViewUsers(t *testing.T) {
 	h := NewHandler(db, "secret")
 
 	// First register the user.
-	assert.NoError(t, registerUser1(db, e, rec, h))
+	assert.NoError(t, registerUser(db, e, rec, h, user1JSON))
 
 	// Login Success
 	assert.NoError(t, loginUser1(db, e, rec, h, user1LoginJSON))
@@ -122,13 +130,88 @@ func TestRegisteredAdminCanViewUsers(t *testing.T) {
 	assert.NoError(t, h.GetRecentUsersPaginated(c))
 	var users []models.User
 	json.Unmarshal([]byte(rec.Body.String()), &users)
-	fmt.Println(users[0])
+	assert.Equal(t, email1, users[0].Email)
+}
+
+// TestCanGetUserByEmail tests that the registered user can get user by email.
+func TestCanGetUserByEmail(t *testing.T) {
+	// Setup
+	db, err := sql.Open("knowledge", "identifier")
+	defer db.Close()
+	checkError(err)
+
+	rec := httptest.NewRecorder()
+	e := echo.New()
+	h := NewHandler(db, "secret")
+
+	// First register the user.
+	assert.NoError(t, registerUser(db, e, rec, h, user1JSON))
+
+	// Login Success
+	assert.NoError(t, loginUser1(db, e, rec, h, user1LoginJSON))
+
+	// Setup to get the user by email.
+	rec = httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/users/email/{email}", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	c := e.NewContext(req, rec)
+	c.SetPath("/users/email/:email")
+	c.SetParamNames("email")
+	c.SetParamValues(email1)
+
+	assert.NoError(t, h.GetUserByEmail(c))
+	var users []models.User
+	json.Unmarshal([]byte(rec.Body.String()), &users)
+	assert.Equal(t, email1, users[0].Email)
+}
+
+// TestCanUpdateOwnUser tests that the registered user can update their properties
+func TestCanUpdateOwnUser(t *testing.T) {
+	// Setup
+	db, err := sql.Open("knowledge", "identifier")
+	defer db.Close()
+	checkError(err)
+
+	rec := httptest.NewRecorder()
+	e := echo.New()
+	h := NewHandler(db, "secret")
+
+	// First register the user.
+	assert.NoError(t, registerUser(db, e, rec, h, user1JSON))
+	// Get the ID of the registered user
+	var user models.User
+	json.Unmarshal([]byte(rec.Body.String()), &user)
+	id := user.UserID
+
+	// Login the user
+	rec = httptest.NewRecorder()
+	assert.NoError(t, loginUser1(db, e, rec, h, user1LoginJSON))
+	result := make(map[string]string)
+	json.Unmarshal([]byte(rec.Body.String()), &result)
+	token := string(result["token"])
+
+	rec = httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodPost, "/users/{id}", strings.NewReader(user1UpdateJSON))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	c := e.NewContext(req, rec)
+	c.SetPath("/users/:id")
+	c.SetParamNames("id")
+	c.SetParamValues(fmt.Sprintf("%d", id))
+	c.Set("user", parseToken(token))
+
+	assert.NoError(t, h.UpdateUser(c))
+
+	var updatedUser models.User
+	json.Unmarshal([]byte(rec.Body.String()), &updatedUser)
+	assert.Equal(t, email1Update, updatedUser.Email)
+	// Check that they can't promote themselves to an admin.
+	assert.Equal(t, false, updatedUser.IsAdmin)
 }
 
 // Private Functions
 
-func registerUser1(db *sql.DB, e *echo.Echo, rec *httptest.ResponseRecorder, h *Handler) error {
-	req := httptest.NewRequest(http.MethodPost, "/registration", strings.NewReader(user1JSON))
+func registerUser(db *sql.DB, e *echo.Echo, rec *httptest.ResponseRecorder, h *Handler, json string) error {
+	req := httptest.NewRequest(http.MethodPost, "/registration", strings.NewReader(json))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c := e.NewContext(req, rec)
 	return h.UserRegistration(c)
@@ -139,6 +222,11 @@ func loginUser1(db *sql.DB, e *echo.Echo, rec *httptest.ResponseRecorder, h *Han
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c := e.NewContext(req, rec)
 	return h.UserLogin(c)
+}
+
+func parseToken(tokenStr string) *jwt.Token {
+	token, _ := jwt.Parse(tokenStr, nil)
+	return token
 }
 
 func checkError(err error) {
