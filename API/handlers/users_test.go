@@ -42,6 +42,12 @@ var (
     "password": "Test-Password",
 	"is_admin": false}`, email2)
 
+	user2UpdateJSON = fmt.Sprintf(`{"email": "%s", 
+    "first_name": "Jackie",
+    "last_name": "Smithy",
+    "password": "Test-Password",
+	"is_admin": true}`, email2)
+
 	user1LoginJSON = fmt.Sprintf(`{"email": "%s", 
 	"password": "Test-Password"}`, email1)
 
@@ -165,8 +171,9 @@ func TestCanGetUserByEmail(t *testing.T) {
 	assert.Equal(t, email1, users[0].Email)
 }
 
-// TestCanUpdateOwnUser tests that the registered user can update their properties
-func TestCanUpdateOwnUser(t *testing.T) {
+// TestCanUpdateOwnUserOnly tests that the registered user can update their
+//  allowed properties but not another user's properties.
+func TestCanUpdateOwnUserOnly(t *testing.T) {
 	// Setup
 	db, err := sql.Open("knowledge", "identifier")
 	defer db.Close()
@@ -186,9 +193,7 @@ func TestCanUpdateOwnUser(t *testing.T) {
 	// Login the user
 	rec = httptest.NewRecorder()
 	assert.NoError(t, loginUser1(db, e, rec, h, user1LoginJSON))
-	result := make(map[string]string)
-	json.Unmarshal([]byte(rec.Body.String()), &result)
-	token := string(result["token"])
+	token := getLoginToken(rec)
 
 	rec = httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/users/{id}", strings.NewReader(user1UpdateJSON))
@@ -204,8 +209,28 @@ func TestCanUpdateOwnUser(t *testing.T) {
 	var updatedUser models.User
 	json.Unmarshal([]byte(rec.Body.String()), &updatedUser)
 	assert.Equal(t, email1Update, updatedUser.Email)
-	// Check that they can't promote themselves to an admin.
+	// Check that they can't promote themselves to an admin
 	assert.Equal(t, false, updatedUser.IsAdmin)
+
+	// Check that they can't edit another user
+	// Register a second user.
+	rec = httptest.NewRecorder()
+	assert.NoError(t, registerUser(db, e, rec, h, user2JSON))
+	// Get the ID of the second user
+	json.Unmarshal([]byte(rec.Body.String()), &user)
+	id = user.UserID
+
+	rec = httptest.NewRecorder()
+	req = httptest.NewRequest(http.MethodPost, "/users/{id}", strings.NewReader(user2UpdateJSON))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	c = e.NewContext(req, rec)
+	c.SetPath("/users/:id")
+	c.SetParamNames("id")
+	c.SetParamValues(fmt.Sprintf("%d", id))
+	c.Set("user", parseToken(token))
+
+	assert.Error(t, h.UpdateUser(c))
+
 }
 
 // Private Functions
@@ -222,6 +247,12 @@ func loginUser1(db *sql.DB, e *echo.Echo, rec *httptest.ResponseRecorder, h *Han
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c := e.NewContext(req, rec)
 	return h.UserLogin(c)
+}
+
+func getLoginToken(rec *httptest.ResponseRecorder) string {
+	result := make(map[string]string)
+	json.Unmarshal([]byte(rec.Body.String()), &result)
+	return string(result["token"])
 }
 
 func parseToken(tokenStr string) *jwt.Token {

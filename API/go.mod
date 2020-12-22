@@ -6,6 +6,7 @@ require (
 	github.com/DATA-DOG/go-txdb v0.1.3
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/labstack/echo/v4 v4.1.17
 	github.com/lib/pq v1.8.0

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -8,6 +9,8 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 	echo "github.com/labstack/echo/v4"
 	"github.com/turnkey-commerce/knowledge-keeper/httputil"
 	"github.com/turnkey-commerce/knowledge-keeper/models"
@@ -136,6 +139,13 @@ func (h *Handler) UserRegistration(c echo.Context) error {
 	}
 
 	u.Email = strings.ToLower(u.Email)
+
+	//Validate the password is at least 8 characters and the email is valid
+	err := validateRegistration(*u)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("%s", err))
+	}
+
 	// Check that there's not a duplicate user
 	users, _ := models.UsersByEmail(h.DB, u.Email)
 	if len(users) > 0 {
@@ -226,4 +236,12 @@ func clearHash(users []*models.User) {
 	for _, user := range users {
 		user.Hash = ""
 	}
+}
+
+func validateRegistration(user models.UserRegistration) error {
+	return validation.ValidateStruct(&user,
+		// Password cannot be empty, and the length must greater than 8
+		validation.Field(&user.Password, validation.Required, validation.Length(8, 0)),
+		validation.Field(&user.Email, validation.Required, is.Email),
+	)
 }
