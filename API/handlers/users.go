@@ -155,7 +155,7 @@ func (h *Handler) UserRegistration(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "User already exists")
 	}
 
-	hash, err := hashPassword(u.Password)
+	hash, err := HashPassword(u.Password)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Can't process user hash")
 	}
@@ -216,7 +216,7 @@ func (h *Handler) UpdateUser(c echo.Context) error {
 		existingUser.IsActive = u.IsActive
 	}
 
-	hash, err := hashPassword(u.Password)
+	hash, err := HashPassword(u.Password)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Can't process user hash")
 	}

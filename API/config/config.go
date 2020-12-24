@@ -4,6 +4,7 @@ package config
 type Configurations struct {
 	Server   ServerConfigurations
 	Database DatabaseConfigurations
+	SeedUser SeedUserConfigurations
 }
 
 // ServerConfigurations exported
@@ -18,4 +19,10 @@ type DatabaseConfigurations struct {
 	DBUser     string
 	DBPassword string
 	DBName     string
+}
+
+// SeedUserConfigurations exported
+type SeedUserConfigurations struct {
+	Email           string
+	InitialPassword string
 }

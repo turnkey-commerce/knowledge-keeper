@@ -58,6 +58,11 @@ func main() {
 	db := database.New(conf.Database.DBName, conf.Database.Server, conf.Database.DBUser, conf.Database.DBPassword)
 	fmt.Println(db.Stats().InUse)
 
+	err = database.Seed(db, conf.SeedUser.Email, conf.SeedUser.InitialPassword)
+	if err != nil {
+		fmt.Printf("Unable to seed the database, %v", err)
+	}
+
 	middlewares.UseMiddleware(e)
 
 	h := handlers.NewHandler(db, conf.Server.Secret)

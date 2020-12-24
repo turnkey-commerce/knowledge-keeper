@@ -20,8 +20,8 @@ func getLimitAndOffset(c echo.Context) (limit int, offset int) {
 	return limitIn, offsetIn
 }
 
-// hashPassword returns the salted hash for a given password.
-func hashPassword(pwd string) (string, error) {
+// HashPassword returns the salted hash for a given password.
+func HashPassword(pwd string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.MinCost)
 	if err != nil {
 		return "", err

@@ -7,3 +7,7 @@
   dbuser = "knowledge-keeper"
   dbpassword = "knowledge-keeper"
   #dbname = "knowledge-keeper"
+
+[seedUser]
+  email = "admin@example.com"
+  initialPassword = "change$me"
