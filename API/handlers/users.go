@@ -16,6 +16,10 @@ import (
 	"github.com/turnkey-commerce/knowledge-keeper/models"
 )
 
+var (
+	minPasswordLength = 8
+)
+
 // GetRecentUsersPaginated godoc
 // @Summary Get Recent Users Paginated
 // @Description Gets Recent Users with optional Pagination
@@ -198,6 +202,7 @@ func (h *Handler) UpdateUser(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Can't process input user")
 	}
 
+	// Check credentials of user making the change.
 	isAdmin := httputil.IsAdmin(c)
 	isExistingUser := httputil.IsUserEditingSelf(c, existingUser.Email)
 	// Only admins or the same user can edit a user.
@@ -210,17 +215,25 @@ func (h *Handler) UpdateUser(c echo.Context) error {
 		return err
 	}
 
+	err = validateUpdate(*u)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("%s", err))
+	}
+
 	if isAdmin {
 		// Only Admin's can change these properties
 		existingUser.IsAdmin = u.IsAdmin
 		existingUser.IsActive = u.IsActive
 	}
 
-	hash, err := HashPassword(u.Password)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "Can't process user hash")
+	if strings.TrimSpace(u.Password) != "" {
+		hash, err := HashPassword(u.Password)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, "Can't process user hash")
+		}
+		existingUser.Hash = hash
 	}
-	existingUser.Hash = hash
+
 	existingUser.Email = strings.ToLower(u.Email)
 	existingUser.FirstName = u.FirstName
 	existingUser.LastName = u.LastName
@@ -230,7 +243,7 @@ func (h *Handler) UpdateUser(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Can't update user "+err.Error())
 	}
 
-	// Clear password the hash so it's not returned.
+	// Clear the hash so it's not returned.
 	existingUser.Hash = ""
 
 	return c.JSON(http.StatusOK, existingUser)
@@ -245,7 +258,15 @@ func clearHash(users []*models.User) {
 func validateRegistration(user models.UserRegistration) error {
 	return validation.ValidateStruct(&user,
 		// Password cannot be empty, and the length must greater than 8
-		validation.Field(&user.Password, validation.Required, validation.Length(8, 0)),
+		validation.Field(&user.Password, validation.Required, validation.Length(minPasswordLength, 0)),
+		validation.Field(&user.Email, validation.Required, is.Email),
+	)
+}
+
+func validateUpdate(user models.UserUpdate) error {
+	return validation.ValidateStruct(&user,
+		// Password cannot be empty if provided, and the length must greater than 8
+		validation.Field(&user.Password, validation.Length(minPasswordLength, 0)),
 		validation.Field(&user.Email, validation.Required, is.Email),
 	)
 }

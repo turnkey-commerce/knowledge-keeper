@@ -34,8 +34,8 @@ var (
 	user1UpdateJSON = fmt.Sprintf(`{"email": "%s", 
     "first_name": "Jukie",
     "last_name": "Smithy",
-    "password": "Test-Password",
-	"is_admin": true}`, email1Update)
+	"is_admin": true,
+	"is_active": false}`, email1Update)
 
 	user2JSON = fmt.Sprintf(`{"email": "%s", 
     "first_name": "Jack",
@@ -55,6 +55,9 @@ var (
 
 	user1BadLoginJSON = fmt.Sprintf(`{"email": "%s", 
 	"password": "Bogus"}`, email1)
+
+	adminUserLoginJSON = `{"email": "admin@example.com", 
+	"password": "change$me"}`
 )
 
 func init() {
@@ -213,6 +216,8 @@ func TestCanUpdateOwnUserOnly(t *testing.T) {
 	assert.Equal(t, email1Update, updatedUser.Email)
 	// Check that they can't promote themselves to an admin
 	assert.Equal(t, false, updatedUser.IsAdmin)
+	// Check that they can't inactivate themselves
+	assert.Equal(t, true, updatedUser.IsActive)
 
 	// Check that they can't edit another user
 	// Register a second user.
@@ -232,7 +237,49 @@ func TestCanUpdateOwnUserOnly(t *testing.T) {
 	c.Set("user", parseToken(token))
 
 	assert.Error(t, h.UpdateUser(c))
+}
 
+// TestAdminCanUpdateUsers tests that the admin can update a registered user to change
+//   their admin status and make them inactive.
+func TestAdminCanUpdateUsers(t *testing.T) {
+	// Setup
+	db, err := sql.Open("knowledge", "identifier")
+	defer db.Close()
+	checkError(err)
+
+	rec := httptest.NewRecorder()
+	e := echo.New()
+	h := NewHandler(db, "secret")
+
+	// First register the user.
+	assert.NoError(t, registerUser(db, e, rec, h, user1JSON))
+	// Get the ID of the registered user
+	var user models.User
+	json.Unmarshal([]byte(rec.Body.String()), &user)
+	id := user.UserID
+
+	// Login the admin user
+	rec = httptest.NewRecorder()
+	assert.NoError(t, loginUser1(db, e, rec, h, adminUserLoginJSON))
+	token := getLoginToken(rec)
+
+	rec = httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodPost, "/users/{id}", strings.NewReader(user1UpdateJSON))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	c := e.NewContext(req, rec)
+	c.SetPath("/users/:id")
+	c.SetParamNames("id")
+	c.SetParamValues(fmt.Sprintf("%d", id))
+	c.Set("user", parseToken(token))
+
+	assert.NoError(t, h.UpdateUser(c))
+
+	var updatedUser models.User
+	json.Unmarshal([]byte(rec.Body.String()), &updatedUser)
+	assert.Equal(t, email1Update, updatedUser.Email)
+	// Check that they were promoted to Admin and Inactive
+	assert.Equal(t, true, updatedUser.IsAdmin)
+	assert.Equal(t, false, updatedUser.IsActive)
 }
 
 // Private Functions
