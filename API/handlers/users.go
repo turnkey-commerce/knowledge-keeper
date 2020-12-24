@@ -94,6 +94,9 @@ func (h *Handler) UserLogin(c echo.Context) error {
 		return echo.ErrUnauthorized
 	}
 	user := users[0]
+	if !user.IsActive {
+		return echo.ErrUnauthorized
+	}
 	if !validatePassword(user.Hash, u.Password) {
 		return echo.ErrUnauthorized
 	}
@@ -208,8 +211,9 @@ func (h *Handler) UpdateUser(c echo.Context) error {
 	}
 
 	if isAdmin {
-		// Only Admin's can change this property
+		// Only Admin's can change these properties
 		existingUser.IsAdmin = u.IsAdmin
+		existingUser.IsActive = u.IsActive
 	}
 
 	hash, err := hashPassword(u.Password)

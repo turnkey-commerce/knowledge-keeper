@@ -28,7 +28,8 @@ var (
     "first_name": "Juke",
     "last_name": "Smith",
     "password": "Test-Password",
-	"is_admin": false}`, email1)
+	"is_admin": false,
+	"is_active": true}`, email1)
 
 	user1UpdateJSON = fmt.Sprintf(`{"email": "%s", 
     "first_name": "Jukie",
@@ -40,7 +41,8 @@ var (
     "first_name": "Jack",
     "last_name": "Smith",
     "password": "Test-Password",
-	"is_admin": false}`, email2)
+	"is_admin": false,
+	"is_active": true}`, email2)
 
 	user2UpdateJSON = fmt.Sprintf(`{"email": "%s", 
     "first_name": "Jackie",

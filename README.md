@@ -4,6 +4,23 @@ A web frontend and API for storing and retrieving knowledge obtained about varie
 
 ## Build Tools
 
+### Gendal
+
+Allows rebuilding the data access layer after database changes.
+
+Install:
+
+```sh
+go get github.com/turnkey-commerce/gendal
+```
+
+Build DB Access Layer:
+
+```sh
+cd API
+gendal
+```
+
 ### Fresh
 
 Allows hot loading of echo API.

@@ -61,6 +61,9 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<column name="is_admin" not-null="true" default-value="false">
 		<type name="bool" length="0"/>
 	</column>
+	<column name="is_active" not-null="true" default-value="true">
+		<type name="bool" length="0"/>
+	</column>
 	<column name="date_created" not-null="true" default-value="CURRENT_TIMESTAMP">
 		<type name="timestamp" length="0"/>
 	</column>

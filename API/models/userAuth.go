@@ -24,4 +24,5 @@ type UserUpdate struct {
 	FirstName string `json:"first_name"` // first_name
 	LastName  string `json:"last_name"`  // last_name
 	IsAdmin   bool   `json:"is_admin"`   // is_admin
+	IsActive  bool   `json:"is_active"`  // is_active
 }

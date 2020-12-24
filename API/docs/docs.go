@@ -391,6 +391,10 @@ var doc = `{
                     "description": "hash",
                     "type": "string"
                 },
+                "is_active": {
+                    "description": "is_active",
+                    "type": "boolean"
+                },
                 "is_admin": {
                     "description": "is_admin",
                     "type": "boolean"
@@ -419,6 +423,10 @@ var doc = `{
                 "first_name": {
                     "description": "first_name",
                     "type": "string"
+                },
+                "is_active": {
+                    "description": "is_active",
+                    "type": "boolean"
                 },
                 "is_admin": {
                     "description": "is_admin",
