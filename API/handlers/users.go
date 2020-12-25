@@ -12,6 +12,7 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	echo "github.com/labstack/echo/v4"
+	"github.com/turnkey-commerce/knowledge-keeper/database"
 	"github.com/turnkey-commerce/knowledge-keeper/httputil"
 	"github.com/turnkey-commerce/knowledge-keeper/models"
 )
@@ -159,7 +160,7 @@ func (h *Handler) UserRegistration(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "User already exists")
 	}
 
-	hash, err := HashPassword(u.Password)
+	hash, err := database.HashPassword(u.Password)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Can't process user hash")
 	}
@@ -227,7 +228,7 @@ func (h *Handler) UpdateUser(c echo.Context) error {
 	}
 
 	if strings.TrimSpace(u.Password) != "" {
-		hash, err := HashPassword(u.Password)
+		hash, err := database.HashPassword(u.Password)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, "Can't process user hash")
 		}

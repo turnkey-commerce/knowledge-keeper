@@ -15,6 +15,8 @@ import (
 	echo "github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
+	"github.com/turnkey-commerce/knowledge-keeper/config"
+	"github.com/turnkey-commerce/knowledge-keeper/database"
 	"github.com/turnkey-commerce/knowledge-keeper/models"
 	"github.com/xo/dburl"
 )
@@ -61,7 +63,18 @@ var (
 )
 
 func init() {
-	u, err := dburl.Parse("postgres://knowledge-keeper:knowledge-keeper@localhost/knowledge-keeper?sslmode=disable")
+	conf, err := config.GetConfig("..")
+	if err != nil {
+		fmt.Printf("Unable to load the configuration, %v", err)
+	}
+	connString := database.GetConnectionString(conf.Database)
+
+	db := database.New(connString)
+	err = database.Seed(db, conf.SeedUser.Email, conf.SeedUser.InitialPassword)
+	if err != nil {
+		fmt.Printf("Unable to seed the database, %v", err)
+	}
+	u, err := dburl.Parse(connString)
 	if err != nil {
 		log.Fatal(err)
 	}
