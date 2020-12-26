@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 
@@ -62,7 +63,9 @@ var (
 	"password": "change$me"}`
 )
 
-func init() {
+func TestMain(m *testing.M) {
+
+	exitVal := m.Run()
 	conf, err := config.GetConfig("..")
 	if err != nil {
 		fmt.Printf("Unable to load the configuration, %v", err)
@@ -74,6 +77,17 @@ func init() {
 	if err != nil {
 		fmt.Printf("Unable to seed the database, %v", err)
 	}
+
+	os.Exit(exitVal)
+}
+
+func init() {
+	conf, err := config.GetConfig("..")
+	if err != nil {
+		fmt.Printf("Unable to load the configuration, %v", err)
+	}
+	connString := database.GetConnectionString(conf.Database)
+
 	u, err := dburl.Parse(connString)
 	if err != nil {
 		log.Fatal(err)
@@ -277,7 +291,7 @@ func TestAdminCanUpdateUsers(t *testing.T) {
 	token := getLoginToken(rec)
 
 	rec = httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodPost, "/users/{id}", strings.NewReader(user1UpdateJSON))
+	req := httptest.NewRequest(http.MethodPut, "/users/{id}", strings.NewReader(user1UpdateJSON))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c := e.NewContext(req, rec)
 	c.SetPath("/users/:id")

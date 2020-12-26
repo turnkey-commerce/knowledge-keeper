@@ -9,6 +9,15 @@ definitions:
         example: status bad request
         type: string
     type: object
+  models.CategoryDTO:
+    properties:
+      description:
+        description: description
+        type: string
+      name:
+        description: name
+        type: string
+    type: object
   models.Token:
     properties:
       token:
@@ -86,6 +95,222 @@ info:
   title: Knowledge Keeper API
   version: "1.0"
 paths:
+  /categories:
+    get:
+      consumes:
+      - application/json
+      description: Gets Recent Categories with optional Pagination
+      parameters:
+      - default: 50
+        description: Limit returned per page
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset from start row
+        in: query
+        name: offset
+        type: integer
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.CategoryDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Categories Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Recent Categories Paginated
+      tags:
+      - categories
+    post:
+      consumes:
+      - application/json
+      description: Creates new category
+      parameters:
+      - description: Create Category
+        in: body
+        name: Category
+        required: true
+        schema:
+          $ref: '#/definitions/models.CategoryDTO'
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.CategoryDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Bad Input
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: Create new category
+      tags:
+      - categories
+  /categories/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Category By ID
+      parameters:
+      - description: id of category
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.CategoryDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Category Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Category By ID
+      tags:
+      - categories
+    put:
+      consumes:
+      - application/json
+      description: Updates existing category
+      parameters:
+      - description: id of category
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Category
+        in: body
+        name: UpdateCategory
+        required: true
+        schema:
+          $ref: '#/definitions/models.CategoryDTO'
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.CategoryDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Bad Input
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: Update existing category
+      tags:
+      - categories
+  /categories/name/{name}:
+    get:
+      consumes:
+      - application/json
+      description: Get Category By Name
+      parameters:
+      - description: name of category
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.CategoryDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Category Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Category By Name
+      tags:
+      - categories
   /login:
     post:
       consumes:
@@ -208,7 +433,7 @@ paths:
         name: id
         required: true
         type: integer
-      - description: Update
+      - description: Update User
         in: body
         name: UserUpdate
         required: true

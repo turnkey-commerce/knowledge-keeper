@@ -188,7 +188,7 @@ func (h *Handler) UserRegistration(c echo.Context) error {
 // @Accept  json
 // @Produce  json
 // @Param id path int true "id of user"
-// @Param UserUpdate body models.UserUpdate true "Update"
+// @Param UserUpdate body models.UserUpdate true "Update User"
 // @Success 201 {object} models.UserRegistration
 // @Failure 400 {object} httputil.HTTPError "Bad Request"
 // @Failure 401 {object} httputil.HTTPError "Unauthorized"
