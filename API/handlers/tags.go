@@ -47,12 +47,12 @@ func (h *Handler) GetTagTopics(c echo.Context) error {
 // GetTagByName returns the tag by name.
 func (h *Handler) GetTagByName(c echo.Context) error {
 	name := c.Param("name")
-	tags, err := models.TagsByName(h.DB, name)
+	tag, err := models.TagByName(h.DB, name)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "Can't find tag "+name)
 	}
 
-	return c.JSON(http.StatusOK, tags)
+	return c.JSON(http.StatusOK, tag)
 }
 
 // SaveTag saves the tag to the database.

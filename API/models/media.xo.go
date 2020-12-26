@@ -261,6 +261,32 @@ func MediaByTitle(db XODB, title string) ([]*Media, error) {
 	return res, nil
 }
 
+// MediaByTopicIDTitle retrieves a row from 'public.media' as a Media.
+//
+// Generated from index 'media_topics_title_unique_idx'.
+func MediaByTopicIDTitle(db XODB, topicID int64, title string) (*Media, error) {
+	var err error
+
+	// sql query
+	const sqlstr = `SELECT ` +
+		`media_id, type, title, description, url, created_by, updated_by, topic_id ` +
+		`FROM public.media ` +
+		`WHERE topic_id = $1 AND title = $2`
+
+	// run query
+	XOLog(sqlstr, topicID, title)
+	m := Media{
+		_exists: true,
+	}
+
+	err = db.QueryRow(sqlstr, topicID, title).Scan(&m.MediaID, &m.Type, &m.Title, &m.Description, &m.URL, &m.CreatedBy, &m.UpdatedBy, &m.TopicID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &m, nil
+}
+
 // MediaByType retrieves a row from 'public.media' as a Media.
 //
 // Generated from index 'media_type_idx'.

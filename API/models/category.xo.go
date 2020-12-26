@@ -193,10 +193,10 @@ func GetRecentPaginatedCategorys(db XODB, limit int, offset int) ([]*Category, e
 	return res, nil
 }
 
-// CategoriesByName retrieves a row from 'public.categories' as a Category.
+// CategoryByName retrieves a row from 'public.categories' as a Category.
 //
-// Generated from index 'categories_name_idx'.
-func CategoriesByName(db XODB, name string) ([]*Category, error) {
+// Generated from index 'categories_name_unique_idx'.
+func CategoryByName(db XODB, name string) (*Category, error) {
 	var err error
 
 	// sql query
@@ -207,29 +207,16 @@ func CategoriesByName(db XODB, name string) ([]*Category, error) {
 
 	// run query
 	XOLog(sqlstr, name)
-	q, err := db.Query(sqlstr, name)
+	c := Category{
+		_exists: true,
+	}
+
+	err = db.QueryRow(sqlstr, name).Scan(&c.CategoryID, &c.Name, &c.Description, &c.CreatedBy, &c.UpdatedBy)
 	if err != nil {
 		return nil, err
 	}
-	defer q.Close()
 
-	// load results
-	res := []*Category{}
-	for q.Next() {
-		c := Category{
-			_exists: true,
-		}
-
-		// scan
-		err = q.Scan(&c.CategoryID, &c.Name, &c.Description, &c.CreatedBy, &c.UpdatedBy)
-		if err != nil {
-			return nil, err
-		}
-
-		res = append(res, &c)
-	}
-
-	return res, nil
+	return &c, nil
 }
 
 // CategoryByCategoryID retrieves a row from 'public.categories' as a Category.

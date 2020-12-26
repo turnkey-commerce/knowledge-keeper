@@ -194,6 +194,32 @@ func GetRecentPaginatedTopics(db XODB, limit int, offset int) ([]*Topic, error) 
 	return res, nil
 }
 
+// TopicByTitleCategoryID retrieves a row from 'public.topics' as a Topic.
+//
+// Generated from index 'topics_category_title_unique_idx'.
+func TopicByTitleCategoryID(db XODB, title string, categoryID int64) (*Topic, error) {
+	var err error
+
+	// sql query
+	const sqlstr = `SELECT ` +
+		`topic_id, category_id, title, description, created_by, updated_by ` +
+		`FROM public.topics ` +
+		`WHERE title = $1 AND category_id = $2`
+
+	// run query
+	XOLog(sqlstr, title, categoryID)
+	t := Topic{
+		_exists: true,
+	}
+
+	err = db.QueryRow(sqlstr, title, categoryID).Scan(&t.TopicID, &t.CategoryID, &t.Title, &t.Description, &t.CreatedBy, &t.UpdatedBy)
+	if err != nil {
+		return nil, err
+	}
+
+	return &t, nil
+}
+
 // TopicByTopicID retrieves a row from 'public.topics' as a Topic.
 //
 // Generated from index 'topics_pk'.

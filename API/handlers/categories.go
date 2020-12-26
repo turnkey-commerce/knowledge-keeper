@@ -75,12 +75,12 @@ func (h *Handler) GetCategoryByCategoryID(c echo.Context) error {
 // @Router /categories/name/{name} [get]
 func (h *Handler) GetCategoryByName(c echo.Context) error {
 	name := c.Param("name")
-	categories, err := models.CategoriesByName(h.DB, name)
-	if err != nil || len(categories) == 0 {
+	category, err := models.CategoryByName(h.DB, name)
+	if err != nil || category == nil {
 		return echo.NewHTTPError(http.StatusNotFound, "Can't find category "+name)
 	}
 
-	return c.JSON(http.StatusOK, categories)
+	return c.JSON(http.StatusOK, category)
 }
 
 // SaveCategory godoc

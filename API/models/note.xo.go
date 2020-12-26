@@ -258,3 +258,29 @@ func NotesByTitle(db XODB, title string) ([]*Note, error) {
 
 	return res, nil
 }
+
+// NoteByTitleTopicID retrieves a row from 'public.notes' as a Note.
+//
+// Generated from index 'notes_topics_title_idx'.
+func NoteByTitleTopicID(db XODB, title string, topicID int64) (*Note, error) {
+	var err error
+
+	// sql query
+	const sqlstr = `SELECT ` +
+		`note_id, title, description, created_by, updated_by, topic_id ` +
+		`FROM public.notes ` +
+		`WHERE title = $1 AND topic_id = $2`
+
+	// run query
+	XOLog(sqlstr, title, topicID)
+	n := Note{
+		_exists: true,
+	}
+
+	err = db.QueryRow(sqlstr, title, topicID).Scan(&n.NoteID, &n.Title, &n.Description, &n.CreatedBy, &n.UpdatedBy, &n.TopicID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &n, nil
+}

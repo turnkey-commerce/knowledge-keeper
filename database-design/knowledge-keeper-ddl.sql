@@ -183,30 +183,12 @@ CREATE INDEX users_email_idx ON public.users
 	);
 -- ddl-end --
 
--- object: categories_name_idx | type: INDEX --
--- DROP INDEX IF EXISTS public.categories_name_idx CASCADE;
-CREATE INDEX categories_name_idx ON public.categories
-	USING btree
-	(
-	  name
-	);
--- ddl-end --
-
 -- object: topics_title_idx | type: INDEX --
 -- DROP INDEX IF EXISTS public.topics_title_idx CASCADE;
 CREATE INDEX topics_title_idx ON public.topics
 	USING btree
 	(
 	  title
-	);
--- ddl-end --
-
--- object: tags_name_idx | type: INDEX --
--- DROP INDEX IF EXISTS public.tags_name_idx CASCADE;
-CREATE INDEX tags_name_idx ON public.tags
-	USING btree
-	(
-	  name
 	);
 -- ddl-end --
 
@@ -365,6 +347,54 @@ AS
 SELECT media.*
     FROM media JOIN topics
       ON topics.topic_id = media.topic_id;
+-- ddl-end --
+
+-- object: categories_name_unique_idx | type: INDEX --
+-- DROP INDEX IF EXISTS public.categories_name_unique_idx CASCADE;
+CREATE UNIQUE INDEX categories_name_unique_idx ON public.categories
+	USING btree
+	(
+	  name
+	);
+-- ddl-end --
+
+-- object: topics_category_title_unique_idx | type: INDEX --
+-- DROP INDEX IF EXISTS public.topics_category_title_unique_idx CASCADE;
+CREATE UNIQUE INDEX topics_category_title_unique_idx ON public.topics
+	USING btree
+	(
+	  title,
+	  category_id ASC NULLS LAST
+	);
+-- ddl-end --
+
+-- object: tags_name_unique_idx | type: INDEX --
+-- DROP INDEX IF EXISTS public.tags_name_unique_idx CASCADE;
+CREATE UNIQUE INDEX tags_name_unique_idx ON public.tags
+	USING btree
+	(
+	  name
+	);
+-- ddl-end --
+
+-- object: media_topics_title_unique_idx | type: INDEX --
+-- DROP INDEX IF EXISTS public.media_topics_title_unique_idx CASCADE;
+CREATE UNIQUE INDEX media_topics_title_unique_idx ON public.media
+	USING btree
+	(
+	  topic_id,
+	  title ASC NULLS LAST
+	);
+-- ddl-end --
+
+-- object: notes_topics_title_idx | type: INDEX --
+-- DROP INDEX IF EXISTS public.notes_topics_title_idx CASCADE;
+CREATE UNIQUE INDEX notes_topics_title_idx ON public.notes
+	USING btree
+	(
+	  title,
+	  topic_id ASC NULLS LAST
+	);
 -- ddl-end --
 
 -- object: categories_created_by_fk | type: CONSTRAINT --

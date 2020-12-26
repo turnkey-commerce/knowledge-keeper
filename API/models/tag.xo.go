@@ -192,10 +192,10 @@ func GetRecentPaginatedTags(db XODB, limit int, offset int) ([]*Tag, error) {
 	return res, nil
 }
 
-// TagsByName retrieves a row from 'public.tags' as a Tag.
+// TagByName retrieves a row from 'public.tags' as a Tag.
 //
-// Generated from index 'tags_name_idx'.
-func TagsByName(db XODB, name string) ([]*Tag, error) {
+// Generated from index 'tags_name_unique_idx'.
+func TagByName(db XODB, name string) (*Tag, error) {
 	var err error
 
 	// sql query
@@ -206,29 +206,16 @@ func TagsByName(db XODB, name string) ([]*Tag, error) {
 
 	// run query
 	XOLog(sqlstr, name)
-	q, err := db.Query(sqlstr, name)
+	t := Tag{
+		_exists: true,
+	}
+
+	err = db.QueryRow(sqlstr, name).Scan(&t.Name, &t.TagID, &t.CreatedBy, &t.UpdatedBy)
 	if err != nil {
 		return nil, err
 	}
-	defer q.Close()
 
-	// load results
-	res := []*Tag{}
-	for q.Next() {
-		t := Tag{
-			_exists: true,
-		}
-
-		// scan
-		err = q.Scan(&t.Name, &t.TagID, &t.CreatedBy, &t.UpdatedBy)
-		if err != nil {
-			return nil, err
-		}
-
-		res = append(res, &t)
-	}
-
-	return res, nil
+	return &t, nil
 }
 
 // TagByTagID retrieves a row from 'public.tags' as a Tag.

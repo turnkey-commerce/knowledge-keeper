@@ -65,7 +65,6 @@ var (
 
 func TestMain(m *testing.M) {
 
-	exitVal := m.Run()
 	conf, err := config.GetConfig("..")
 	if err != nil {
 		fmt.Printf("Unable to load the configuration, %v", err)
@@ -77,6 +76,8 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		fmt.Printf("Unable to seed the database, %v", err)
 	}
+
+	exitVal := m.Run()
 
 	os.Exit(exitVal)
 }

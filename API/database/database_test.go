@@ -38,10 +38,10 @@ func TestCreateUserAndCategories(t *testing.T) {
 		t.Error("Created user not correct:\n", usersByEmail[0])
 	}
 
-	categoriesByName, err := models.CategoriesByName(db, categoryName)
+	categoryByName, err := models.CategoryByName(db, categoryName)
 	checkError(err)
-	if categoriesByName[0].Name != categoryName {
-		t.Error("Created category not correct:\n", categoriesByName[0])
+	if categoryByName.Name != categoryName {
+		t.Error("Created category not correct:\n", categoryByName)
 	}
 }
 
