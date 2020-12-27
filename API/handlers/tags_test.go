@@ -180,10 +180,10 @@ func TestCanGetTagByNameOrID(t *testing.T) {
 	c.SetParamValues(fmt.Sprintf("%d", id))
 	// Assert
 	assert.NoError(t, h.GetTagByTagID(c))
-	var TagById models.Tag
-	json.Unmarshal([]byte(rec.Body.String()), &TagById)
-	assert.Equal(t, id, TagById.TagID)
-	assert.Equal(t, Tag1Name, TagById.Name)
+	var TagByID models.Tag
+	json.Unmarshal([]byte(rec.Body.String()), &TagByID)
+	assert.Equal(t, id, TagByID.TagID)
+	assert.Equal(t, Tag1Name, TagByID.Name)
 }
 
 // Private functions

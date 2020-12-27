@@ -180,10 +180,10 @@ func TestCanGetCategoryByNameOrID(t *testing.T) {
 	c.SetParamValues(fmt.Sprintf("%d", id))
 	// Assert
 	assert.NoError(t, h.GetCategoryByCategoryID(c))
-	var categoryById models.Category
-	json.Unmarshal([]byte(rec.Body.String()), &categoryById)
-	assert.Equal(t, id, categoryById.CategoryID)
-	assert.Equal(t, category1Name, categoryById.Name)
+	var categoryByID models.Category
+	json.Unmarshal([]byte(rec.Body.String()), &categoryByID)
+	assert.Equal(t, id, categoryByID.CategoryID)
+	assert.Equal(t, category1Name, categoryByID.Name)
 }
 
 // Private functions
